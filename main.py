@@ -4,6 +4,8 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QMessageBox
 from PyQt5.uic import loadUi
 
+from controlPage import ControlPage
+
 class DemoImpl(QMainWindow):
 	def __init__(self, *args):
 		super(DemoImpl, self).__init__(*args)
@@ -26,7 +28,7 @@ class DemoImpl(QMainWindow):
 
 	@pyqtSlot()
 	def on_newtab_clicked(self):
-		print "open New tab";
+		print "open control page";
 
 		widge = QWidget()
 		# if graph != "null":
@@ -34,10 +36,13 @@ class DemoImpl(QMainWindow):
 		#     widgetName = graph.plotType
 		# else:
 
-		widgetName = "Unknown Controller"
+		widgetName = "control"
 
-		self.tabWidget.addTab(widge, widgetName)
-		self.tabWidget.setCurrentWidget(widge)
+		self._controlPage = ControlPage(self)
+		self.tabWidget.addTab(self._controlPage, widgetName)
+		self.tabWidget.setCurrentWidget(self._controlPage)
+
+
 
 if __name__ == '__main__':
 		

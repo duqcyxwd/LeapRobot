@@ -1,2 +1,5 @@
 Testing/*.*
 Testing/
+*.pyc
+*.autosave
+.DS_Store
