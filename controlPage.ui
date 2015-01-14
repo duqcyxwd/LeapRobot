@@ -93,7 +93,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton">
+            <widget class="QPushButton" name="goforward">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -102,6 +102,9 @@
              </property>
              <property name="text">
               <string>Forward</string>
+             </property>
+             <property name="shortcut">
+              <string>Up</string>
              </property>
             </widget>
            </item>
@@ -117,23 +120,32 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
-            <widget class="QPushButton" name="left">
+            <widget class="QPushButton" name="goleft">
              <property name="text">
+              <string>Left</string>
+             </property>
+             <property name="shortcut">
               <string>Left</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="back">
+            <widget class="QPushButton" name="goback">
              <property name="text">
               <string>Back</string>
+             </property>
+             <property name="shortcut">
+              <string>Down</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="right">
+            <widget class="QPushButton" name="goright">
              <property name="text">
               <string>right</string>
+             </property>
+             <property name="shortcut">
+              <string>Right</string>
              </property>
             </widget>
            </item>
@@ -143,7 +155,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="verticalFrame_2">
+       <widget class="QFrame" name="verticalFrame_1">
         <property name="frameShape">
          <enum>QFrame::Box</enum>
         </property>
@@ -162,14 +174,14 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="up1_4">
+          <widget class="QPushButton" name="up1">
            <property name="text">
             <string>up</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="down1_4">
+          <widget class="QPushButton" name="down1">
            <property name="text">
             <string>down</string>
            </property>
@@ -179,7 +191,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="verticalFrame_3">
+       <widget class="QFrame" name="verticalFrame_2">
         <property name="frameShape">
          <enum>QFrame::Box</enum>
         </property>
@@ -193,19 +205,19 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>servo1</string>
+            <string>servo2</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="up1_5">
+          <widget class="QPushButton" name="up2">
            <property name="text">
             <string>up</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="down1_5">
+          <widget class="QPushButton" name="down2">
            <property name="text">
             <string>down</string>
            </property>
@@ -215,7 +227,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="verticalFrame_4">
+       <widget class="QFrame" name="verticalFrame_3">
         <property name="frameShape">
          <enum>QFrame::Box</enum>
         </property>
@@ -229,19 +241,19 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>servo1</string>
+            <string>servo3</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="up1_6">
+          <widget class="QPushButton" name="up3">
            <property name="text">
             <string>up</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="down1_6">
+          <widget class="QPushButton" name="down3">
            <property name="text">
             <string>down</string>
            </property>
@@ -251,7 +263,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="verticalFrame">
+       <widget class="QFrame" name="verticalFrame_4">
         <property name="frameShape">
          <enum>QFrame::Box</enum>
         </property>
@@ -265,19 +277,19 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>servo1</string>
+            <string>servo4</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="up1_3">
+          <widget class="QPushButton" name="up4">
            <property name="text">
             <string>up</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="down1_3">
+          <widget class="QPushButton" name="down4">
            <property name="text">
             <string>down</string>
            </property>

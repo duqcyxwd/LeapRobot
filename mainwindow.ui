@@ -54,23 +54,27 @@
           </item>
          </layout>
         </item>
-        <item>
-         <widget class="QPushButton" name="newtab">
-          <property name="text">
-           <string>newtab</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton_2">
-      <property name="text">
-       <string>PushButton</string>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="newtab">
+        <property name="text">
+         <string>Start Control</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>TestConnection</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -94,8 +98,8 @@
     <property name="title">
      <string>About</string>
     </property>
-    <addaction name="actionAbout_us"/>
     <addaction name="actionHelp"/>
+    <addaction name="actionAbout_us"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAbout"/>
@@ -127,7 +131,7 @@
   </action>
   <action name="actionTesting">
    <property name="text">
-    <string>Testing</string>
+    <string>Test Log</string>
    </property>
   </action>
   <action name="actionStartConnection">

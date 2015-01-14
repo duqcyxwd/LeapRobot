@@ -17,6 +17,9 @@ class MainWindow(QMainWindow):
 		self._controlPage = "null"
 
 
+	def setController(self, controller):
+		self._controller = controller
+
 	def testing(self):
 		for s in "This is a demo".split(" "):
 			self.logList.addItem(s)
