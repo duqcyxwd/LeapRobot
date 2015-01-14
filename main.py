@@ -1,26 +1,32 @@
 import sys
 
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow
+from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QMessageBox
 from PyQt5.uic import loadUi
 
 class DemoImpl(QMainWindow):
-    def __init__(self, *args):
-        super(DemoImpl, self).__init__(*args)
+	def __init__(self, *args):
+		super(DemoImpl, self).__init__(*args)
 
-        loadUi('MainWindow.ui', self)
-        self.actionTesting.triggered.connect(self.testing)
+		loadUi('MainWindow.ui', self)
+		self.actionTesting.triggered.connect(self.testing)
+		self.actionAbout_us.triggered.connect(self.openAbout)
 
 
-    @pyqtSlot()
-    def testing(self):
-        for s in "This is a demo".split(" "):
-            self.logList.addItem(s)
-        print "hi";
+	def testing(self):
+		for s in "This is a demo".split(" "):
+			self.logList.addItem(s)
+		print "Testing";
 
-    @pyqtSlot()
-    def on_newtab_clicked(self):
-		print "hi";
+	def openAbout(self):
+
+		message = "This is Leap-Robotic control program."
+		reply = QMessageBox.information(self,
+		        "QMessageBox.information()", message)
+
+	@pyqtSlot()
+	def on_newtab_clicked(self):
+		print "open New tab";
 
 		widge = QWidget()
 		# if graph != "null":
