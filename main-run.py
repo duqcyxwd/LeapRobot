@@ -5,16 +5,30 @@ from mainwindow import MainWindow
 
 class LeapArm(object):
 	"""docstring for LeapArm"""
-	def __init__(self, arg):
+	def __init__(self):
 		super(LeapArm, self).__init__()
 
 		self.mw = MainWindow()
-		seff.mw.setController(self)
-		self.initConnection()
+		self.mw.show()
+		self.mw.setController(self)
+		self.startConnection()
 		self.initSockets()
 		
-	def initConnection(self):
+	def startConnection(self):
+		# start connection here
+		# 
+		# if connected, or connection down, restart connection. 
+		# 
+		# Todo: Add icon to display connection states. 
+		self.mw.addLog("start new Connection")
+		
 		pass
+
+	def stopConnection(self):
+		print "stopConnection"
+		self.mw.addLog("Stop Connection")
+		pass
+
 
 	def initSockets(self):
 		pass
@@ -23,8 +37,8 @@ class LeapArm(object):
 # run
 def main():
 	app = QApplication(sys.argv)
-	mainwindow = MainWindow()
-	mainwindow.show()
+	mainwindow = LeapArm()
+	# mainwindow.show()
 	app.exec_()
 
 

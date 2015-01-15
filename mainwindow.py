@@ -18,8 +18,10 @@ class MainWindow(QMainWindow):
 
 
 	def setController(self, controller):
-		self._controller = controller
+		# print "set controller"
 
+		self._controller = controller
+		
 	def testing(self):
 		for s in "This is a demo".split(" "):
 			self.logList.addItem(s)
@@ -31,6 +33,10 @@ class MainWindow(QMainWindow):
 		reply = QMessageBox.information(self,
 				"QMessageBox.information()", message)
 
+	def addLog(self, string):
+		self.logList.addItem(string)
+		pass
+
 	@pyqtSlot()
 	def on_newtab_clicked(self):
 		print "open/focus on control page";
@@ -41,6 +47,10 @@ class MainWindow(QMainWindow):
 			self.tabWidget.addTab(self._controlPage, widgetName)
 
 		self.tabWidget.setCurrentWidget(self._controlPage)
+
+	def on_stopConnection_pressed(self):
+		print "stop button pressed"
+		self._controller.stopConnection()
 
 if __name__ == '__main__':
 		
