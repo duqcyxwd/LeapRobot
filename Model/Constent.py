@@ -1,0 +1,2 @@
+LOCALHOST="localhost"
+SERVER_PORT=9996

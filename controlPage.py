@@ -3,6 +3,7 @@ import sys
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5.uic import loadUiType
+from robotHand import GLWidget
 
 
 app = QApplication(sys.argv)
@@ -11,12 +12,17 @@ class ControlPage(base_class, form_class):
 	def __init__(self, *args):
 		super(ControlPage, self).__init__(*args)
 		self.setupUi(self)
-		# self.setWindowTitle('control page')
-		
+
+		handWidget = GLWidget()
+		self.robothandLayout.addWidget(handWidget)
+
+		# self.carLayout.addWidget()
+
+
+		# Set the connection
 		self.goforward.pressed.connect(self.testFunction)
 	
 	@pyqtSlot()
-
 	def testFunction(self):
 		print "Test button connection"
 		pass

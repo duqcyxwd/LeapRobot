@@ -23,23 +23,26 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QFrame" name="simulatecar">
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
+      <widget class="QWidget" name="widget_2" native="true">
+       <layout class="QVBoxLayout" name="carLayout"/>
       </widget>
      </item>
      <item>
-      <widget class="QFrame" name="hand">
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
+      <widget class="QWidget" name="widget" native="true">
+       <layout class="QVBoxLayout" name="robothandLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+       </layout>
       </widget>
      </item>
     </layout>
