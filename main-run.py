@@ -72,7 +72,9 @@ class LeapArm(QtCore.QObject):
 		self.mw.addLog("stop Leap Control")
 
 		self.leapControlThread.stopListen()
-		self.leapControlThread.terminate()
+
+		# TODO: Terminate will crash program, check the reason
+		# self.leapControlThread.terminate()
 		pass
 
 
