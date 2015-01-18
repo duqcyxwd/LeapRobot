@@ -1,12 +1,16 @@
 import sys
 
-from PyQt5.QtCore import pyqtSlot
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QMessageBox
 from PyQt5.uic import loadUi
 
 from controlPage import ControlPage
 
 class MainWindow(QMainWindow):
+	startLeapSignal = QtCore.pyqtSignal()
+	stopLeapSignal = QtCore.pyqtSignal()
+	testSignal = QtCore.pyqtSignal(['QString'])
+
 	def __init__(self, *args):
 		super(MainWindow, self).__init__(*args)
 
@@ -15,7 +19,6 @@ class MainWindow(QMainWindow):
 		self.actionAbout_us.triggered.connect(self.openAbout)
 
 		self._controlPage = "null"
-
 
 	def setController(self, controller):
 		# print "set controller"
@@ -37,8 +40,11 @@ class MainWindow(QMainWindow):
 		self.logList.addItem(string)
 		pass
 
-	@pyqtSlot()
-	def on_newtab_clicked(self):
+
+	def on_newtab_pressed(self):
+		# Start Leap
+		self.startLeapSignal.emit()
+
 		print "open/focus on control page";
 
 		if self._controlPage == "null":
@@ -48,13 +54,41 @@ class MainWindow(QMainWindow):
 
 		self.tabWidget.setCurrentWidget(self._controlPage)
 
+	def on_startLeapController_pressed(self):
+		self.startLeapSignal.emit()
+		pass
+
+	def on_stopLeapController_pressed(self):
+		self.stopLeapSignal.emit()
+		pass
+
 	def on_stopConnection_pressed(self):
 		print "stop button pressed"
 		self._controller.stopConnection()
+
+
+	def on_testConnection_pressed(self):
+		print "testConnection"
+		self.testSignal.connect(self.updateLeapControllerLabel)
+		self.testSignal.emit("hihissshi")
+		
+
+	@QtCore.pyqtSlot(str, name='')
+	def updateLeapControllerLabel(self, str):
+		print "update string: %s" % str
+		self.leapInfo.setText(str)
+		pass
 
 if __name__ == '__main__':
 		
 	app = QApplication(sys.argv)
 	widget = MainWindow()
 	widget.show()
+
+	import time
+	widget.updateLeapControllerLabel("hi")
+	time.sleep(3)
+	widget.updateLeapControllerLabel("hi2")
+	i = 0
+
 	sys.exit(app.exec_())

@@ -1,19 +1,43 @@
 import sys
 from PyQt5.QtWidgets import QApplication
+from PyQt5 import QtCore
 
+from leapController import LeapController
 from mainwindow import MainWindow
 
-class LeapArm(object):
+class LeapArm(QtCore.QObject):
 	"""docstring for LeapArm"""
 	def __init__(self):
 		super(LeapArm, self).__init__()
 
+		self.app = QApplication(sys.argv)
+
+		#start MainWindow
 		self.mw = MainWindow()
 		self.mw.show()
 		self.mw.setController(self)
+
 		self.startConnection()
 		self.initSockets()
 		
+
+
+		# self.connect(self.mw, QtCore.SIGNAL("startLeapSignal"), self, QtCore.SLOT("startLeapController()"))
+		# self.mw.startLeapSignal.connect(self, QtCore.SLOT("startLeapController()"))
+		self.mw.startLeapSignal.connect(self.startLeapController)
+		self.mw.stopLeapSignal.connect(self.stopLeapControl)
+
+
+
+		# startLeapSingnal
+
+
+	def run(self):
+		self.app.exec_()
+		pass
+
+
+	@QtCore.pyqtSlot()
 	def startConnection(self):
 		# start connection here
 		# 
@@ -30,17 +54,37 @@ class LeapArm(object):
 		pass
 
 
-	def initSockets(self):
+	def startLeapController(self):
+		self.mw.addLog("start leap controller")
+		
+		self.leapControlThread = LeapController()
+		self.leapControlThread.stringSignal.connect(self.mw.updateLeapControllerLabel)
+
+		# terminate application when leap controller killed
+		# self.leapControlThread.finished.connect(self.app.exit)
+		
+		self.leapControlThread.start()
+		
+		pass
+
+	def stopLeapControl(self):
+		print "stopConnection"
+		self.mw.addLog("stop Leap Control")
+
+		self.leapControlThread.stopListen()
+		self.leapControlThread.terminate()
 		pass
 
 
+	def initSockets(self):
+		pass
+
+# qtSignal ..
+# startLeapSingnal
 # run
 def main():
-	app = QApplication(sys.argv)
 	mainwindow = LeapArm()
-	# mainwindow.show()
-	app.exec_()
-
+	mainwindow.run()
 
 if __name__ == '__main__':
 	main()	
