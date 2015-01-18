@@ -62,14 +62,6 @@ class LeapController(QtCore.QThread):
 	def stopListen(self):
 		self._controller.remove_listener(self._listener)
 
-	# #  TODO: validate this function??
-	# @QtCore.pyqtSlot()
-	# def stopSignal(self):
-	# 	print "stop signal received"
-	# 	# self.stopListen()
-	# 	# self.terminate()
-	# 	pass
-
 if __name__ == "__main__":
 	def main():
 		app = QtCore.QCoreApplication([])

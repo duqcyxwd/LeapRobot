@@ -21,7 +21,6 @@ class LeapArm(QtCore.QObject):
 		self.initSockets()
 		
 
-
 		# self.connect(self.mw, QtCore.SIGNAL("startLeapSignal"), self, QtCore.SLOT("startLeapController()"))
 		# self.mw.startLeapSignal.connect(self, QtCore.SLOT("startLeapController()"))
 		self.mw.startLeapSignal.connect(self.startLeapController)
