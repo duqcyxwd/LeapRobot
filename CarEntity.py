@@ -47,7 +47,7 @@ class CarEntity(object):
 		pass
 
 	def stop(self):
-		self.speed = 0
+		self.speed = 0 
 		self.update()
 
 	def getDirection(self):

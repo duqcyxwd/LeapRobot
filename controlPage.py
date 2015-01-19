@@ -31,6 +31,7 @@ class ControlPage(base_class, form_class):
 		self.dec.pressed.connect(self.carEntity.decreaseSpeed)
 		self.goleft.pressed.connect(self.carEntity.goLeft)
 		self.goright.pressed.connect(self.carEntity.goRight)
+		self.stop.pressed.connect(self.carEntity.stop)
 
 		self.up1.pressed.connect(self.carEntity.servo1up)
 		self.down1.pressed.connect(self.carEntity.servo1down)
