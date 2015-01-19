@@ -4,6 +4,7 @@ from PyQt5 import QtCore
 
 from leapController import LeapController
 from mainwindow import MainWindow
+from CarEntity import CarEntity
 
 class LeapArm(QtCore.QObject):
 	"""docstring for LeapArm"""
@@ -16,6 +17,8 @@ class LeapArm(QtCore.QObject):
 		self.mw = MainWindow()
 		self.mw.show()
 		self.mw.setController(self)
+
+		self.carEntity = CarEntity()
 
 		self.startConnection()
 		self.initSockets()
