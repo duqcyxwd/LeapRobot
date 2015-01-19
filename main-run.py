@@ -19,6 +19,7 @@ class LeapArm(QtCore.QObject):
 		self.mw.setController(self)
 
 		self.carEntity = CarEntity()
+		self.mw.setCarEntity(self.carEntity)
 
 		self.startConnection()
 		self.initSockets()

@@ -25,6 +25,9 @@ class MainWindow(QMainWindow):
 
 		self._controller = controller
 		
+	def setCarEntity(self, carEntity):
+		self.carEntity = carEntity
+		
 	def testing(self):
 		for s in "This is a demo".split(" "):
 			self.logList.addItem(s)
@@ -53,6 +56,7 @@ class MainWindow(QMainWindow):
 			self.tabWidget.addTab(self._controlPage, widgetName)
 
 		self.tabWidget.setCurrentWidget(self._controlPage)
+		self._controlPage.setCarEntity(self.carEntity)
 
 	def on_startLeapController_pressed(self):
 		self.startLeapSignal.emit()

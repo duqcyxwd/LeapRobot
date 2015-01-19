@@ -21,9 +21,7 @@ class ControlPage(base_class, form_class):
 		self.robothandLayout.addWidget(handWidget)
 
 		# self.carLayout.addWidget()
-		
-		carEntity = CarEntity()
-		self.setCarEntity(carEntity)
+
 
 	
 	def setCarEntity(self, carEntity):
@@ -124,5 +122,8 @@ if __name__ == '__main__':
 	from CarEntity import CarEntity
 	from time import sleep
 
+			
+	carEntity = CarEntity()
+	self.setCarEntity(carEntity)
 
 	sys.exit(app.exec_())
