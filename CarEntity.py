@@ -1,7 +1,11 @@
 from Model.Constent import *
+from PyQt5 import QtCore
 
-class CarEntity(object):
+class CarEntity(QtCore.QObject):
 	"""docstring for CarEntity"""
+
+	updateSignal = QtCore.pyqtSignal()
+
 	def __init__(self):
 		super(CarEntity, self).__init__()
 		self.speed = INITSPEED
@@ -19,15 +23,7 @@ class CarEntity(object):
 		self.update()
 
 	def update(self):
-		try:
-			self.widget
-			self.widget.updateCarInterface()
-		except Exception, e:
-			raise e
-
-	def setUI(self, widget):
-		self.widget = widget
-		pass
+		self.updateSignal.emit()
 
 	def getSpeed(self):
 		return self.speed
