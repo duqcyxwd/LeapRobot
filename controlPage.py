@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5.uic import loadUiType
 
 from robotHand import GLWidget
+from CarEntity import CarEntity
 
 
 app = QApplication(sys.argv)
@@ -19,13 +20,15 @@ class ControlPage(base_class, form_class):
 		handWidget = GLWidget()
 		self.robothandLayout.addWidget(handWidget)
 
-		# self.carLayout.addWidget()
-
+		carEntity = CarEntity()
+		self.setCarEntity(carEntity, handWidget)
 	
-	def setCarEntity(self, carEntity):
-		self.carEntity = carEntity;
-		carEntity.setUI(self)
+	def setCarEntity(self, carEntity, handWidget):
+		self.carEntity = carEntity
+		self.handWidget = handWidget
 
+		self.carEntity.updateSignal.connect(self.updateCarInterface)
+		self.carEntity.updateSignal.connect(self.handWidget.updateGraph)
 
 		self.inc.pressed.connect(self.carEntity.increaseSpeed)
 		self.dec.pressed.connect(self.carEntity.decreaseSpeed)
@@ -52,6 +55,7 @@ class ControlPage(base_class, form_class):
 	# def updateModel(self):
 	# 	self.updateSignal.emit([50, 1, [2, 3, 4, 5]])
 
+	@pyqtSlot()
 	def updateCarInterface(self):
 		self.speedLabel.setText(str(self.carEntity.getSpeed()))
 
@@ -116,10 +120,5 @@ if __name__ == '__main__':
 
 	controllPage = ControlPage()
 	controllPage.show()
-
-	from CarEntity import CarEntity
-	from time import sleep
-	carEntity = CarEntity()
-	controllPage.setCarEntity(carEntity)
 
 	sys.exit(app.exec_())

@@ -1,381 +1,698 @@
 import sys
 import math
 
+from Model.Constent import *
 from PyQt5.QtCore import pyqtSignal, QRegExp, QSize, Qt, QTimer
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QAction, QApplication, QGridLayout, QInputDialog,
-		QLabel, QLineEdit, QMainWindow, QMessageBox, QScrollArea, QSizePolicy,
-		QSlider, QWidget)
+        QLabel, QLineEdit, QMainWindow, QMessageBox, QScrollArea, QSizePolicy,
+        QSlider, QWidget)
 from PyQt5.QtOpenGL import QGLWidget
 
-from OpenGL.GL import *
-
+try:
+    from OpenGL.GL import *
+except ImportError:
+    app = QApplication(sys.argv)
+    QMessageBox.critical(None, "OpenGL grabber",
+            "PyOpenGL must be installed to run this example.")
+    sys.exit(1)
 
 
 class GLWidget(QGLWidget):
-	xRotationChanged = pyqtSignal(int)
-	yRotationChanged = pyqtSignal(int)
-	zRotationChanged = pyqtSignal(int)
+    xRotationChanged = pyqtSignal(int)
+    yRotationChanged = pyqtSignal(int)
+    zRotationChanged = pyqtSignal(int)
 
-	def __init__(self, parent=None):
-		super(GLWidget, self).__init__(parent)
+    def __init__(self, parent=None):
+        super(GLWidget, self).__init__(parent)
 
-		self.gear1 = 0
-		self.gear2 = 0
-		self.gear3 = 0
-		self.xRot = 0
-		self.yRot = 0
-		self.zRot = 0
-		self.gear1Rot = 0
+        self.box1 = 0
+        self.cylinder1 = 0
+        self.gear1 = 0
+        self.gear2 = 0
+        self.gear3 = 0
+        self.xRot = 0
+        self.yRot = 0
+        self.zRot = 0
+        self.gear1Rot = 0 # tier
+        self.plierClosing = -1
+        self.handHorizontal = 0
+        self.handVertical = 0
+        self.forward = 1
+        self.speed = INITSPEED
+        self.gear1angle = 15.0 * math.pi / 180.0     # red body
+        self.gear2angle = -30.0 * math.pi / 180.0     # green body
+        self.gear3angle = 60.0 * math.pi / 180.0     # plier
 
-		timer = QTimer(self)
-		timer.timeout.connect(self.advanceGears)
-		timer.start(20)
+        self.gear1Rot = 0.0
+        self.turn = 1
+        self.tier1angle = math.pi / 4.0
 
-	def setXRotation(self, angle):
-		self.normalizeAngle(angle)
+        timer = QTimer(self)
+        timer.timeout.connect(self.advanceGears)
+        timer.start(20)
 
-		if angle != self.xRot:
-			self.xRot = angle
-			self.xRotationChanged.emit(angle)
-			self.updateGL()
+    def setXRotation(self, angle):
+        self.normalizeAngle(angle)
 
-	def setYRotation(self, angle):
-		self.normalizeAngle(angle)
+        if angle != self.xRot:
+            self.xRot = angle
+            self.xRotationChanged.emit(angle)
+            self.updateGL()
 
-		if angle != self.yRot:
-			self.yRot = angle
-			self.yRotationChanged.emit(angle)
-			self.updateGL()
+    def setYRotation(self, angle):
+        self.normalizeAngle(angle)
 
-	def setZRotation(self, angle):
-		self.normalizeAngle(angle)
+        if angle != self.yRot:
+            self.yRot = angle
+            self.yRotationChanged.emit(angle)
+            self.updateGL()
 
-		if angle != self.zRot:
-			self.zRot = angle
-			self.zRotationChanged.emit(angle)
-			self.updateGL()
+    def setZRotation(self, angle):
+        self.normalizeAngle(angle)
 
-	def initializeGL(self):
-		lightPos = (5.0, 5.0, 10.0, 1.0)
-		reflectance1 = (0.8, 0.1, 0.0, 1.0)
-		reflectance2 = (0.0, 0.8, 0.2, 1.0)
-		reflectance3 = (0.2, 0.2, 1.0, 1.0)
+        if angle != self.zRot:
+            self.zRot = angle
+            self.zRotationChanged.emit(angle)
+            self.updateGL()
 
-		glLightfv(GL_LIGHT0, GL_POSITION, lightPos)
-		glEnable(GL_LIGHTING)
-		glEnable(GL_LIGHT0)
-		glEnable(GL_DEPTH_TEST)
+    def setHorizontalChange(self, angle):
+        while (angle < 0):
+            angle += 360 * 16
 
-		self.gear1 = self.makeGear(reflectance1, 1.0, 4.0, 1.0, 0.7, 20)
-		self.gear2 = self.makeGear(reflectance2, 0.5, 2.0, 2.0, 0.7, 10)
-		self.gear3 = self.makeGear(reflectance3, 1.3, 2.0, 0.5, 0.7, 10)
+        while (angle > 360 * 16):
+            angle -= 360 * 16
 
-		glEnable(GL_NORMALIZE)
-		glClearColor(0.0, 0.0, 0.0, 1.0)
+        self.gear1angletemp = angle
+        self.horizontalChanged.emit(angle)
 
-	def paintGL(self):
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    def setVerticalChange(self, angle):
+        while (angle < 0):
+            angle += 360 * 16
 
-		glPushMatrix()
-		glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
-		glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
-		glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
+        while (angle > 360 * 16):
+            angle -= 360 * 16
 
-		self.drawGear(self.gear1, -3.0, -2.0, 0.0, self.gear1Rot / 16.0)
-		self.drawGear(self.gear2, +3.1, -2.0, 0.0,
-				-2.0 * (self.gear1Rot / 16.0) - 9.0)
+        self.gear2angletemp = angle
+        self.verticalChanged.emit(angle)
 
-		glRotated(+90.0, 1.0, 0.0, 0.0)
-		self.drawGear(self.gear3, -3.1, -1.8, -2.2,
-				+2.0 * (self.gear1Rot / 16.0) - 2.0)
+    def setPiterChange(self, angle):
+        while (angle < 0):
+            angle += 360 * 16
 
-		glPopMatrix()
+        while (angle > 360 * 16):
+            angle -= 360 * 16
 
-	def resizeGL(self, width, height):
-		side = min(width, height)
-		if side < 0:
-			return
+        self.gear3angletemp = angle
+        self.piterChanged.emit(angle)
 
-		glViewport((width - side) // 2, (height - side) // 2, side, side)
+    def initializeGL(self):
+        lightPos = (5.0, 5.0, 10.0, 1.0)
+        reflectance1 = (1.0, 0.0, 0.0, 1.0)
+        reflectance2 = (0.0, 1.0, 0.0, 1.0)
+        reflectance3 = (0.0, 0.0, 1.0, 1.0)
+        reflectance4 = (1.0, 1.0, 0.0, 1.0)
+        reflectance5 = (1.0, 0.0, 1.0, 1.0)
 
-		glMatrixMode(GL_PROJECTION)
-		glLoadIdentity()
-		glFrustum(-1.0, +1.0, -1.0, 1.0, 5.0, 60.0)
-		glMatrixMode(GL_MODELVIEW)
-		glLoadIdentity()
-		glTranslated(0.0, 0.0, -40.0)
+        glLightfv(GL_LIGHT0, GL_POSITION, lightPos)
+        glEnable(GL_LIGHTING)
+        glEnable(GL_LIGHT0)
+        glEnable(GL_DEPTH_TEST)
 
-	def mousePressEvent(self, event):
-		self.lastPos = event.pos()
+        self.box1 = self.box(reflectance1, 0.0, 0.0, 3.0, 1.0, 0.1, 0.0)    # red 1
+        self.box2 = self.box(reflectance2, 0.0, 0.0, 7.0, 1.0, 0.1, 0.0)    # green 1
+        self.box3 = self.box(reflectance1, 0.0, 0.0, 9.0, 1.0, 0.1, 0.0)    # red 2 connects plier
+        self.box4 = self.box(reflectance2, 0.0, 0.0, 7.0, 1.0, 0.1, 0.0)    # green 2
+        self.box5 = self.box(reflectance3, 0.0, 0.0, 4.0, 1.0, 0.5, 0.0)    # bottom blue
+        self.box6 = self.box(reflectance3, 0.0, 0.0, 2.0, 1.0, 0.1, 0.0)    # hand blue
+        self.box7 = self.box(reflectance4, 0.0, 0.0, 2.0, 1.0, 0.1, 0.0)    # hand yellow 1
+        self.box8 = self.box(reflectance4, 0.0, 0.0, 2.0, 1.0, 0.1, 0.0)    # hand yellow 2
+        self.box9 = self.box(reflectance5, 0.0, 0.0, 2.0, 1.0, 0.1, 0.0)    # hand yellow 2
+        self.box10 = self.box(reflectance5, 0.0, 0.0, 2.0, 1.0, 0.1, 0.0)    # hand yellow 2
 
-	def mouseMoveEvent(self, event):
-		dx = event.x() - self.lastPos.x()
-		dy = event.y() - self.lastPos.y()
 
-		if event.buttons() & Qt.LeftButton:
-			self.setXRotation(self.xRot + 8 * dy)
-			self.setYRotation(self.yRot + 8 * dx)
-		elif event.buttons() & Qt.RightButton:
-			self.setXRotation(self.xRot + 8 * dy)
-			self.setZRotation(self.zRot + 8 * dx)
+        self.cylinder1 = self.cylinder(reflectance1, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder2 = self.cylinder(reflectance2, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder3 = self.cylinder(reflectance2, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder4 = self.cylinder(reflectance1, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder5 = self.cylinder(reflectance1, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder6 = self.cylinder(reflectance2, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder7 = self.cylinder(reflectance2, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder8 = self.cylinder(reflectance1, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder9 = self.cylinder(reflectance3, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder10 = self.cylinder(reflectance1, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder11 = self.cylinder(reflectance3, 0.0, 0.5, 1.0, 0.0, 10000)
 
-		self.lastPos = event.pos()
+        self.tier1 = self.tier(reflectance2, 0.0, 2.0, 2.0, 1.0, 20)
+        self.tier2 = self.tier(reflectance2, 0.0, 2.0, 2.0, 1.0, 20)
+        self.tier3 = self.tier(reflectance4, 0.0, 2.0, 2.0, 1.0, 20)
+        self.tier4 = self.tier(reflectance4, 0.0, 2.0, 2.0, 1.0, 20)
 
-	def advanceGears(self):
-		self.gear1Rot += 2 * 16
-		self.updateGL()    
+        self.cylinder12 = self.cylinder(reflectance3, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder13 = self.cylinder(reflectance5, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder14 = self.cylinder(reflectance5, 0.0, 0.5, 1.0, 0.0, 10000)
 
-	def xRotation(self):
-		return self.xRot
+        self.box11 = self.box(reflectance1, -6.0, -6.0, 16.0, 3.0, 3.0, 0.0)    # car 1
 
-	def yRotation(self):
-		return self.yRot
+        glEnable(GL_NORMALIZE)
+        glClearColor(0.0, 0.0, 0.0, 1.0)
 
-	def zRotation(self):
-		return self.zRot
+    def paintGL(self):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-	def makeGear(self, reflectance, innerRadius, outerRadius, thickness, toothSize, toothCount):
-		list = glGenLists(1)
-		glNewList(list, GL_COMPILE)
-		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, reflectance)
+        glPushMatrix()
+        glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
+        glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
+        glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 
-		r0 = innerRadius
-		r1 = outerRadius - toothSize / 2.0
-		r2 = outerRadius + toothSize / 2.0
-		delta = (2.0 * math.pi / toothCount) / 4.0
-		z = thickness / 2.0
+        self.drawBox(self.box1, 0.0, 0.0, 0.0, 180 / math.pi * self.gear1angle)
+        self.drawBox(self.box2, 3.0 * math.cos(self.gear1angle), 3.0 * math.sin(self.gear1angle), 1.0,180 / math.pi * (math.pi / 2.0 + self.gear2angle))
+        self.drawBox(self.box3, 3.0 * math.cos(self.gear1angle) - 7.0 * math.sin(self.gear2angle), 3.0 * math.sin(self.gear1angle) + 7.0 * math.cos(self.gear2angle), 0.0, 180 / math.pi * (math.pi + self.gear1angle))
+        self.drawBox(self.box4, -7.0 * math.sin(self.gear2angle), 7.0 * math.cos(self.gear2angle), 1.0, 180 / math.pi *(math.pi / -2.0 + self.gear2angle))
+        self.drawBox(self.box5, 0.0, 0.0, -1.0, -90.0)
+        self.drawBox(self.box6, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)), 21.0 * math.cos(self.gear2angle) - (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)) , -1.0, 180.0)
 
-		glShadeModel(GL_FLAT)
+        self.drawCylinder(self.cylinder1, 0.0, 0.0, 0.0, 0.0)
+        self.drawCylinder(self.cylinder2, 0.0, 0.0, 1.0, 0.0)
+        self.drawCylinder(self.cylinder3, 3.0 * math.cos(self.gear1angle), 3.0 * math.sin(self.gear1angle), 1.0, 0.0)
+        self.drawCylinder(self.cylinder4, 3.0 * math.cos(self.gear1angle), 3.0 * math.sin(self.gear1angle), 0.0, 0.0)
+        self.drawCylinder(self.cylinder5, 3.0 * math.cos(self.gear1angle) - 7.0 * math.sin(self.gear2angle), 3.0 * math.sin(self.gear1angle) + 7.0 * math.cos(self.gear2angle), 0.0, 0.0)
+        self.drawCylinder(self.cylinder6, 3.0 * math.cos(self.gear1angle) - 7.0 * math.sin(self.gear2angle), 3.0 * math.sin(self.gear1angle) + 7.0 * math.cos(self.gear2angle), 1.0, 0.0)
+        self.drawCylinder(self.cylinder7, -7.0 * math.sin(self.gear2angle), 7.0 * math.cos(self.gear2angle), 1.0, 0.0)
+        self.drawCylinder(self.cylinder8, -7.0 * math.sin(self.gear2angle), 7.0 * math.cos(self.gear2angle), 0.0, 0.0)
+        self.drawCylinder(self.cylinder9, 0.0, 0.0, -1.0, 0.0)
+        self.drawCylinder(self.cylinder10, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)), 21.0 * math.cos(self.gear2angle) - (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 0.0, 0.0)
+        self.drawCylinder(self.cylinder11, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)), 21.0 * math.cos(self.gear2angle) - (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), -1.0, 0.0)
 
-		for i in range(2):
-			if i == 0:
-				sign = +1.0
-			else:
-				sign = -1.0
+        self.drawBox(self.box11, 0.0, 0.0, 0.0, 0.0)
 
-			glNormal3d(0.0, 0.0, sign)
+        self.drawTier(self.tier1, -4.0, -8.0, 3.5, self.gear1Rot / 16.0, self.tier1angle / math.pi * 180.0)
+        self.drawTier(self.tier2, -4.0, -8.0, -3.5, self.gear1Rot / 16.0, self.tier1angle / math.pi * 180.0)
+        self.drawTier(self.tier3, 8.0, -8.0, 3.5, self.gear1Rot / 16.0, 0.0)
+        self.drawTier(self.tier4, 8.0, -8.0, -3.5, self.gear1Rot / 16.0, 0.0)
 
-			glBegin(GL_QUAD_STRIP)
+        glRotated(+90.0, 1.0, 0.0, 0.0)
+        # x = x, y = z, z = -y
+        self.drawCylinder(self.cylinder12, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0, -1.0, -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 0.0)
+        self.drawBox(self.box7, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0, -1.0, -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 180.0 - self.gear3angle / math.pi * 180.0)
+        self.drawBox(self.box8, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0, -1.0, -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 180.0 + self.gear3angle / math.pi * 180.0)
+        self.drawCylinder(self.cylinder13, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 - 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 0.0)
+        self.drawCylinder(self.cylinder14, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 + 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 0.0)
+        self.drawBox(self.box9, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 - 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 180.0)
+        self.drawBox(self.box10, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 + 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 180.0)
 
-			for j in range(toothCount+1):
-				angle = 2.0 * math.pi * j / toothCount
-				glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), sign * z)
-				glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), sign * z)
-				glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), sign * z)
-				glVertex3d(r1 * math.cos(angle + 3 * delta), r1 * math.sin(angle + 3 * delta), sign * z)
 
-			glEnd()
+        glPopMatrix()
 
-			glBegin(GL_QUADS)
+    def resizeGL(self, width, height):
+        side = min(width, height)
+        if side < 0:
+            return
 
-			for j in range(toothCount):
-				angle = 2.0 * math.pi * j / toothCount                
-				glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), sign * z)
-				glVertex3d(r2 * math.cos(angle + delta), r2 * math.sin(angle + delta), sign * z)
-				glVertex3d(r2 * math.cos(angle + 2 * delta), r2 * math.sin(angle + 2 * delta), sign * z)
-				glVertex3d(r1 * math.cos(angle + 3 * delta), r1 * math.sin(angle + 3 * delta), sign * z)
+        glViewport((width - side) // 2, (height - side) // 2, side, side)
 
-			glEnd()
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        glFrustum(-2.0, +2.0, -2.0, 2.0, 5.0, 60.0)
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+        glTranslated(0.0, 0.0, -40.0)
 
-		glBegin(GL_QUAD_STRIP)
+    def mousePressEvent(self, event):
+        self.lastPos = event.pos()
 
-		for i in range(toothCount):
-			for j in range(2):
-				angle = 2.0 * math.pi * (i + (j / 2.0)) / toothCount
-				s1 = r1
-				s2 = r2
+    def mouseMoveEvent(self, event):
+        dx = event.x() - self.lastPos.x()
+        dy = event.y() - self.lastPos.y()
 
-				if j == 1:
-					s1, s2 = s2, s1
+        if event.buttons() & Qt.LeftButton:
+            self.setXRotation(self.xRot + 8 * dy)
+            self.setYRotation(self.yRot + 8 * dx)
+        elif event.buttons() & Qt.RightButton:
+            self.setXRotation(self.xRot + 8 * dy)
+            self.setZRotation(self.zRot + 8 * dx)
 
-				glNormal3d(math.cos(angle), math.sin(angle), 0.0)
-				glVertex3d(s1 * math.cos(angle), s1 * math.sin(angle), +z)
-				glVertex3d(s1 * math.cos(angle), s1 * math.sin(angle), -z)
+        self.lastPos = event.pos()
 
-				glNormal3d(s2 * math.sin(angle + delta) - s1 * math.sin(angle), s1 * math.cos(angle) - s2 * math.cos(angle + delta), 0.0)
-				glVertex3d(s2 * math.cos(angle + delta), s2 * math.sin(angle + delta), +z)
-				glVertex3d(s2 * math.cos(angle + delta), s2 * math.sin(angle + delta), -z)
+    def advanceGears(self):
 
-		glVertex3d(r1, 0.0, +z)
-		glVertex3d(r1, 0.0, -z)
-		glEnd()
+        self.gear1Rot += self.speed * 2 * 16
 
-		glShadeModel(GL_SMOOTH)
+        if self.gear1angle > 150.0 * math.pi / 180.0:
+            self.handHorizontal = 0
+        elif self.gear1angle < 15.0 * math.pi / 180.0:
+            self.handHorizontal = 0
 
-		glBegin(GL_QUAD_STRIP)
+        if self.handHorizontal == 1 and self.gear1angle - self.gear2angle < 89.0 * math.pi / 180.0:
+            self.gear1angle += math.pi / 180.0
 
-		for i in range(toothCount+1):
-			angle = i * 2.0 * math.pi / toothCount
-			glNormal3d(-math.cos(angle), -math.sin(angle), 0.0)
-			glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), +z)
-			glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), -z)
+        if self.handHorizontal == -1:
+            self.gear1angle -= math.pi / 180.0
 
-		glEnd()
 
-		glEndList()
+        if self.gear2angle > 90.0 * math.pi / 180.0:
+            self.handVertical = 0
+        elif self.gear2angle < -30.0 * math.pi / 180.0:
+            self.handVertical = 0
 
-		return list    
+        if self.handVertical == -1 and self.gear1angle - self.gear2angle < 89.0 * math.pi / 180.0:
+            self.gear2angle -= math.pi / 180.0
 
-	def drawGear(self, gear, dx, dy, dz, angle):
-		glPushMatrix()
-		glTranslated(dx, dy, dz)
-		glRotated(angle, 0.0, 0.0, 1.0)
-		glCallList(gear)
-		glPopMatrix()
+        if self.handVertical == 1:
+            self.gear1angle += math.pi / 180.0
 
-	def normalizeAngle(self, angle):
-		while (angle < 0):
-			angle += 360 * 16
 
-		while (angle > 360 * 16):
-			angle -= 360 * 16
+        if self.gear3angle > 60.0 * math.pi / 180.0:
+            self.plierClosing = 0
+        elif self.gear3angle < 16.0 * math.pi / 180.0:
+            self.plierClosing = 0
+
+        if self.plierClosing == 1:
+            self.gear3angle += 2.0 * math.pi / 180.0
+        elif self.plierClosing == -1:
+            self.gear3angle -= 2.0 * math.pi / 180.0
+
+        if self.turn == 1:
+            self.tier1angle = 45.0 * math.pi / 180.0
+        elif self.turn == -1:
+            self.tier1angle = -45.0 * math.pi / 180.0
+
+
+
+        self.updateGL()    
+
+    def xRotation(self):
+        return self.xRot
+
+    def yRotation(self):
+        return self.yRot
+
+    def zRotation(self):
+        return self.zRot
+
+    def box(self, reflectance, x1, y1, length, width, height, angle):
+        list = glGenLists(1)
+        glNewList(list, GL_COMPILE)
+        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, reflectance)
+
+        glBegin(GL_QUADS)
+
+        r = width / 2.0
+
+        glVertex3d(x1 - r * math.sin(angle), y1 + r * math.cos(angle), -height)
+        glVertex3d(x1 + r * math.sin(angle), y1 - r * math.cos(angle), -height)
+        glVertex3d(x1 + length * math.cos(angle) + r * math.sin(angle), y1 + length * math.sin(angle) - r * math.cos(angle), -height)
+        glVertex3d(x1 + length * math.cos(angle) - r * math.sin(angle), y1 + length * math.sin(angle) + r * math.cos(angle), -height)
+
+        glVertex3d(x1 + length * math.cos(angle) - r * math.sin(angle), y1 + length * math.sin(angle) + r * math.cos(angle), +height)
+        glVertex3d(x1 + length * math.cos(angle) + r * math.sin(angle), y1 + length * math.sin(angle) - r * math.cos(angle), +height)
+        glVertex3d(x1 + r * math.sin(angle), y1 - r * math.cos(angle), +height)
+        glVertex3d(x1 - r * math.sin(angle), y1 + r * math.cos(angle), +height)
+
+
+        glVertex3d(x1 - r * math.sin(angle), y1 + r * math.cos(angle), +height)
+        glVertex3d(x1 + r * math.sin(angle), y1 - r * math.cos(angle), +height)
+        glVertex3d(x1 + r * math.sin(angle), y1 - r * math.cos(angle), -height)
+        glVertex3d(x1 - r * math.sin(angle), y1 + r * math.cos(angle), -height)
+
+        glVertex3d(x1 + r * math.sin(angle), y1 - r * math.cos(angle), +height)
+        glVertex3d(x1 + length * math.cos(angle) + r * math.sin(angle), y1 + length * math.sin(angle) - r * math.cos(angle), +height)
+        glVertex3d(x1 + length * math.cos(angle) + r * math.sin(angle), y1 + length * math.sin(angle) - r * math.cos(angle), -height)
+        glVertex3d(x1 + r * math.sin(angle), y1 - r * math.cos(angle), -height)
+
+        glVertex3d(x1 + length * math.cos(angle) + r * math.sin(angle), y1 + length * math.sin(angle) - r * math.cos(angle), +height)
+        glVertex3d(x1 + length * math.cos(angle) - r * math.sin(angle), y1 + length * math.sin(angle) + r * math.cos(angle), +height)
+        glVertex3d(x1 + length * math.cos(angle) - r * math.sin(angle), y1 + length * math.sin(angle) + r * math.cos(angle), -height)
+        glVertex3d(x1 + length * math.cos(angle) + r * math.sin(angle), y1 + length * math.sin(angle) - r * math.cos(angle), -height)
+
+        glVertex3d(x1 + length * math.cos(angle) - r * math.sin(angle), y1 + length * math.sin(angle) + r * math.cos(angle), +height)
+        glVertex3d(x1 - r * math.sin(angle), y1 + r * math.cos(angle), +height)
+        glVertex3d(x1 - r * math.sin(angle), y1 + r * math.cos(angle), -height)
+        glVertex3d(x1 + length * math.cos(angle) - r * math.sin(angle), y1 + length * math.sin(angle) + r * math.cos(angle), -height)
+
+        glEnd()
+
+        glEndList()
+
+        return list
+
+    def cylinder(self, reflectance, innerRadius, outerRadius, thickness, toothSize, toothCount):
+        list = glGenLists(1)
+        glNewList(list, GL_COMPILE)
+        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, reflectance)
+
+        r0 = 0
+        r1 = outerRadius
+
+        delta = (2.0 * math.pi / toothCount) / 4.0
+        z = thickness / 2.0
+
+        glShadeModel(GL_FLAT)
+
+        for i in range(2):
+            if i == 0:
+                sign = +1.0
+            else:
+                sign = -1.0
+
+            glNormal3d(0.0, 0.0, sign)
+
+            glBegin(GL_QUAD_STRIP)
+
+            for j in range(toothCount):
+                angle = 2.0 * math.pi * j / toothCount
+                glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), sign * z)
+                glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), sign * z)
+                glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), sign * z)
+                glVertex3d(r1 * math.cos(angle + 3 * delta), r1 * math.sin(angle + 3 * delta), sign * z)
+
+            glEnd()
+
+        glBegin(GL_QUAD_STRIP)
+
+        for i in range(toothCount):
+
+                angle = 2.0 * math.pi * i / toothCount
+                s1 = r1
+
+                glVertex3d(s1 * math.cos(angle), s1 * math.sin(angle), +z)
+                glVertex3d(s1 * math.cos(angle), s1 * math.sin(angle), -z)
+                glVertex3d(s1 * math.sin(angle), s1 * math.cos(angle), -z)
+                glVertex3d(s1 * math.sin(angle), s1 * math.cos(angle), +z)
+
+        glVertex3d(r1, 0.0, +z)
+        glVertex3d(r1, 0.0, -z)
+        glEnd()
+
+        glShadeModel(GL_SMOOTH)
+
+        glBegin(GL_QUAD_STRIP)
+
+        for i in range(toothCount+1):
+            angle = i * 2.0 * math.pi / toothCount
+            glNormal3d(-math.cos(angle), -math.sin(angle), 0.0)
+            glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), +z)
+            glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), -z)
+
+        glEnd()
+
+        glEndList()
+
+        return list
+
+    def tier(self, reflectance, innerRadius, outerRadius, thickness, toothSize, toothCount):
+        list = glGenLists(1)
+        glNewList(list, GL_COMPILE)
+        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, reflectance)
+
+        r0 = innerRadius
+        r1 = outerRadius - toothSize / 2.0
+        r2 = outerRadius + toothSize / 2.0
+        delta = (2.0 * math.pi / toothCount) / 4.0
+        z = thickness / 2.0
+
+        glShadeModel(GL_FLAT)
+
+        for i in range(2):
+            if i == 0:
+                sign = +1.0
+            else:
+                sign = -1.0
+
+            glNormal3d(0.0, 0.0, sign)
+
+            glBegin(GL_QUAD_STRIP)
+
+            for j in range(toothCount+1):
+                angle = 2.0 * math.pi * j / toothCount
+                glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), sign * z)
+                glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), sign * z)
+                glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), sign * z)
+                glVertex3d(r1 * math.cos(angle + 3 * delta), r1 * math.sin(angle + 3 * delta), sign * z)
+
+            glEnd()
+
+            glBegin(GL_QUADS)
+
+            for j in range(toothCount):
+                angle = 2.0 * math.pi * j / toothCount
+                glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), sign * z)
+                glVertex3d(r2 * math.cos(angle + delta), r2 * math.sin(angle + delta), sign * z)
+                glVertex3d(r2 * math.cos(angle + 2 * delta), r2 * math.sin(angle + 2 * delta), sign * z)
+                glVertex3d(r1 * math.cos(angle + 3 * delta), r1 * math.sin(angle + 3 * delta), sign * z)
+
+            glEnd()
+
+        glBegin(GL_QUAD_STRIP)
+
+        for i in range(toothCount):
+            for j in range(2):
+                angle = 2.0 * math.pi * (i + (j / 2.0)) / toothCount
+                s1 = r1
+                s2 = r2
+
+                if j == 1:
+                    s1, s2 = s2, s1
+
+                glNormal3d(math.cos(angle), math.sin(angle), 0.0)
+                glVertex3d(s1 * math.cos(angle), s1 * math.sin(angle), +z)
+                glVertex3d(s1 * math.cos(angle), s1 * math.sin(angle), -z)
+
+                glNormal3d(s2 * math.sin(angle + delta) - s1 * math.sin(angle), s1 * math.cos(angle) - s2 * math.cos(angle + delta), 0.0)
+                glVertex3d(s2 * math.cos(angle + delta), s2 * math.sin(angle + delta), +z)
+                glVertex3d(s2 * math.cos(angle + delta), s2 * math.sin(angle + delta), -z)
+
+        glVertex3d(r1, 0.0, +z)
+        glVertex3d(r1, 0.0, -z)
+        glEnd()
+
+        glShadeModel(GL_SMOOTH)
+
+        glBegin(GL_QUAD_STRIP)
+
+        for i in range(toothCount+1):
+            angle = i * 2.0 * math.pi / toothCount
+            glNormal3d(-math.cos(angle), -math.sin(angle), 0.0)
+            glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), +z)
+            glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), -z)
+
+        glEnd()
+
+        glEndList()
+
+        return list
+
+    def drawBox(self, box, dx, dy, dz, angle):
+        glPushMatrix()
+        glTranslated(dx, dy, dz)
+        glRotated(angle, 0.0, 0.0, 1.0)
+        glCallList(box)
+        glPopMatrix()
+
+    def drawCylinder(self, cylinder, dx, dy, dz, angle):
+        glPushMatrix()
+        glTranslated(dx, dy, dz)
+        glRotated(angle, 0.0, 1.0, 0.0)
+        glCallList(cylinder)
+        glPopMatrix()
+
+    def drawTier(self, gear, dx, dy, dz, angle, turnAngle):
+        glPushMatrix()
+        glTranslated(dx, dy, dz)
+        glRotated(turnAngle, 0.0, 1.0, 0.0)
+        glRotated(angle, 0.0, 0.0, 1.0)
+        glCallList(gear)
+        glPopMatrix()
+
+
+    def normalizeAngle(self, angle):
+        while (angle < 0):
+            angle += 360 * 16
+
+        while (angle > 360 * 16):
+            angle -= 360 * 16
+
+    def turnLeft(self):
+        self.turn = 1
+
+    def turnRight(self):
+        self.turn = -1
+
+    def turnDefault(self):
+        self.turn = 0
+
+    def moveForward(self):
+        self.forward = 1
+
+    def moveBackward(self):
+        self.forward = -1
+
+    def moveDefault(self):
+        self.forward = 0
+
+    def plierClose(self):
+        self.plierClosing = 1
+
+    def plierOpen(self):
+        self.plierClosing = -1
+
+    def plierDefault(self):
+        self.plierClosing = 0
+
+    def handForward(self):
+        self.handHorizontal = 1
+
+    def handBackward(self):
+        self.handHorizontal = -1
+
+    def handHorizontalDefault(self):
+        self.handHorizontal = 0
+
+    def handHigher(self):
+        self.handVertical = 1
+
+    def handLower(self):
+        self.handVertical = -1
+
+    def handVerticalDefault(self):
+        self.handVertical = 0
+
+    def updateGraph(self):
+        self.speed = self.carEntity.getSpeed()
+
+
+
 
 
 class MainWindow(QMainWindow):
-	def __init__(self):        
-		super(MainWindow, self).__init__()
+    def __init__(self):        
+        super(MainWindow, self).__init__()
 
-		centralWidget = QWidget()
-		self.setCentralWidget(centralWidget)
+        centralWidget = QWidget()
+        self.setCentralWidget(centralWidget)
 
-		self.glWidget = GLWidget()
-		self.pixmapLabel = QLabel()
+        self.glWidget = GLWidget()
+        self.pixmapLabel = QLabel()
 
-		self.glWidgetArea = QScrollArea()
-		self.glWidgetArea.setWidget(self.glWidget)
-		self.glWidgetArea.setWidgetResizable(True)
-		self.glWidgetArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-		self.glWidgetArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-		self.glWidgetArea.setSizePolicy(QSizePolicy.Ignored,
-				QSizePolicy.Ignored)
-		self.glWidgetArea.setMinimumSize(50, 50)
+        self.glWidgetArea = QScrollArea()
+        self.glWidgetArea.setWidget(self.glWidget)
+        self.glWidgetArea.setWidgetResizable(True)
+        self.glWidgetArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.glWidgetArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.glWidgetArea.setSizePolicy(QSizePolicy.Ignored,
+                QSizePolicy.Ignored)
+        self.glWidgetArea.setMinimumSize(50, 50)
 
-		self.pixmapLabelArea = QScrollArea()
-		self.pixmapLabelArea.setWidget(self.pixmapLabel)
-		self.pixmapLabelArea.setSizePolicy(QSizePolicy.Ignored,
-				QSizePolicy.Ignored)
-		self.pixmapLabelArea.setMinimumSize(50, 50)
+        self.pixmapLabelArea = QScrollArea()
+        self.pixmapLabelArea.setWidget(self.pixmapLabel)
+        self.pixmapLabelArea.setSizePolicy(QSizePolicy.Ignored,
+                QSizePolicy.Ignored)
+        self.pixmapLabelArea.setMinimumSize(50, 50)
 
-		xSlider = self.createSlider(self.glWidget.xRotationChanged,
-				self.glWidget.setXRotation)
-		ySlider = self.createSlider(self.glWidget.yRotationChanged,
-				self.glWidget.setYRotation)
-		zSlider = self.createSlider(self.glWidget.zRotationChanged,
-				self.glWidget.setZRotation)
+        self.createActions()
+        self.createMenus()
 
-		self.createActions()
-		self.createMenus()
+        centralLayout = QGridLayout()
+        centralLayout.addWidget(self.glWidgetArea, 0, 0)
+        centralLayout.addWidget(self.pixmapLabelArea, 0, 1)
+        centralWidget.setLayout(centralLayout)
 
-		centralLayout = QGridLayout()
-		centralLayout.addWidget(self.glWidgetArea, 0, 0)
-		centralLayout.addWidget(self.pixmapLabelArea, 0, 1)
-		centralLayout.addWidget(xSlider, 1, 0, 1, 2)
-		centralLayout.addWidget(ySlider, 2, 0, 1, 2)
-		centralLayout.addWidget(zSlider, 3, 0, 1, 2)
-		centralWidget.setLayout(centralLayout)
+        self.setWindowTitle("Car")
+        self.resize(800, 600)
 
-		xSlider.setValue(15 * 16)
-		ySlider.setValue(345 * 16)
-		zSlider.setValue(0 * 16)
+    def renderIntoPixmap(self):
+        size = self.getSize()
 
-		self.setWindowTitle("Grabber")
-		self.resize(400, 300)
+        if size.isValid():
+            pixmap = self.glWidget.renderPixmap(size.width(), size.height())
+            self.setPixmap(pixmap)
 
-	def renderIntoPixmap(self):
-		size = self.getSize()
+    def grabFrameBuffer(self):
+        image = self.glWidget.grabFrameBuffer()
+        self.setPixmap(QPixmap.fromImage(image))
 
-		if size.isValid():
-			pixmap = self.glWidget.renderPixmap(size.width(), size.height())
-			self.setPixmap(pixmap)
+    def clearPixmap(self):
+        self.setPixmap(QPixmap())
 
-	def grabFrameBuffer(self):
-		image = self.glWidget.grabFrameBuffer()
-		self.setPixmap(QPixmap.fromImage(image))
+    def about(self):
+        QMessageBox.about(self, "About Grabber",
+                "The <b>Grabber</b> example demonstrates two approaches for "
+                "rendering OpenGL into a Qt pixmap.")
 
-	def clearPixmap(self):
-		self.setPixmap(QPixmap())
+    def createActions(self):
+        self.renderIntoPixmapAct = QAction("&Render into Pixmap...",
+                self, shortcut="Ctrl+R", triggered=self.renderIntoPixmap)
 
-	def about(self):
-		QMessageBox.about(self, "About Grabber",
-				"The <b>Grabber</b> example demonstrates two approaches for "
-				"rendering OpenGL into a Qt pixmap.")
+        self.grabFrameBufferAct = QAction("&Grab Frame Buffer", self,
+                shortcut="Ctrl+G", triggered=self.grabFrameBuffer)
 
-	def createActions(self):
-		self.renderIntoPixmapAct = QAction("&Render into Pixmap...",
-				self, shortcut="Ctrl+R", triggered=self.renderIntoPixmap)
+        self.clearPixmapAct = QAction("&Clear Pixmap", self,
+                shortcut="Ctrl+L", triggered=self.clearPixmap)
 
-		self.grabFrameBufferAct = QAction("&Grab Frame Buffer", self,
-				shortcut="Ctrl+G", triggered=self.grabFrameBuffer)
+        self.exitAct = QAction("E&xit", self, shortcut="Ctrl+Q",
+                triggered=self.close)
 
-		self.clearPixmapAct = QAction("&Clear Pixmap", self,
-				shortcut="Ctrl+L", triggered=self.clearPixmap)
+        self.aboutAct = QAction("&About", self, triggered=self.about)
 
-		self.exitAct = QAction("E&xit", self, shortcut="Ctrl+Q",
-				triggered=self.close)
+        self.aboutQtAct = QAction("About &Qt", self,
+                triggered=QApplication.instance().aboutQt)
 
-		self.aboutAct = QAction("&About", self, triggered=self.about)
+    def createMenus(self):
+        self.fileMenu = self.menuBar().addMenu("&File")
+        self.fileMenu.addAction(self.renderIntoPixmapAct)
+        self.fileMenu.addAction(self.grabFrameBufferAct)
+        self.fileMenu.addAction(self.clearPixmapAct)
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(self.exitAct)
 
-		self.aboutQtAct = QAction("About &Qt", self,
-				triggered=QApplication.instance().aboutQt)
+        self.helpMenu = self.menuBar().addMenu("&Help")
+        self.helpMenu.addAction(self.aboutAct)
+        self.helpMenu.addAction(self.aboutQtAct)
 
-	def createMenus(self):
-		self.fileMenu = self.menuBar().addMenu("&File")
-		self.fileMenu.addAction(self.renderIntoPixmapAct)
-		self.fileMenu.addAction(self.grabFrameBufferAct)
-		self.fileMenu.addAction(self.clearPixmapAct)
-		self.fileMenu.addSeparator()
-		self.fileMenu.addAction(self.exitAct)
+    def createSlider(self, changedSignal, setterSlot):
+        slider = QSlider(Qt.Horizontal)
+        slider.setRange(0, 360 * 16)
+        slider.setSingleStep(16)
+        slider.setPageStep(15 * 16)
+        slider.setTickInterval(15 * 16)
+        slider.setTickPosition(QSlider.TicksRight)
 
-		self.helpMenu = self.menuBar().addMenu("&Help")
-		self.helpMenu.addAction(self.aboutAct)
-		self.helpMenu.addAction(self.aboutQtAct)
+        slider.valueChanged.connect(setterSlot)
+        changedSignal.connect(slider.setValue)
 
-	def createSlider(self, changedSignal, setterSlot):
-		slider = QSlider(Qt.Horizontal)
-		slider.setRange(0, 360 * 16)
-		slider.setSingleStep(16)
-		slider.setPageStep(15 * 16)
-		slider.setTickInterval(15 * 16)
-		slider.setTickPosition(QSlider.TicksRight)
+        return slider
 
-		slider.valueChanged.connect(setterSlot)
-		changedSignal.connect(slider.setValue)
+    def setPixmap(self, pixmap):
+        self.pixmapLabel.setPixmap(pixmap)
+        size = pixmap.size()
 
-		return slider
+        if size - QSize(1, 0) == self.pixmapLabelArea.maximumViewportSize():
+            size -= QSize(1, 0)
 
-	def setPixmap(self, pixmap):
-		self.pixmapLabel.setPixmap(pixmap)
-		size = pixmap.size()
+        self.pixmapLabel.resize(size)
 
-		if size - QSize(1, 0) == self.pixmapLabelArea.maximumViewportSize():
-			size -= QSize(1, 0)
+    def getSize(self):
+        text, ok = QInputDialog.getText(self, "Grabber",
+                "Enter pixmap size:", QLineEdit.Normal,
+                "%d x %d" % (self.glWidget.width(), self.glWidget.height()))
 
-		self.pixmapLabel.resize(size)
+        if not ok:
+            return QSize()
 
-	def getSize(self):
-		text, ok = QInputDialog.getText(self, "Grabber",
-				"Enter pixmap size:", QLineEdit.Normal,
-				"%d x %d" % (self.glWidget.width(), self.glWidget.height()))
+        regExp = QRegExp("([0-9]+) *x *([0-9]+)")
 
-		if not ok:
-			return QSize()
+        if regExp.exactMatch(text):
+            width = regExp.cap(0).toInt()
+            height = regExp.cap(1).toInt()
+            if width > 0 and width < 2048 and height > 0 and height < 2048:
+                return QSize(width, height)
 
-		regExp = QRegExp(r'([0-9]+) *x *([0-9]+)')
-
-		if regExp.exactMatch(text):
-			width = int(regExp.cap(1))
-			height = int(regExp.cap(2))
-			if width > 0 and width < 2048 and height > 0 and height < 2048:
-				return QSize(width, height)
-
-		return self.glWidget.size()
+        return self.glWidget.size()
 
 
 if __name__ == '__main__':
 
-	app = QApplication(sys.argv)
-	# mainWin = MainWindow()
-	mainWin = GLWidget()
-	mainWin.show()
-	sys.exit(app.exec_())    
+    app = QApplication(sys.argv)
+    mainWin = MainWindow()
+    mainWin.show()
+    sys.exit(app.exec_())    
