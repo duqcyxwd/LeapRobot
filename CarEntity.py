@@ -12,6 +12,10 @@ class CarEntity(QtCore.QObject):
 		self.direction = INITDIR
 		self.servoAngle = [INISERVOANGLE1, INISERVOANGLE2, INISERVOANGLE3, INISERVOANGLE4]
 
+	def updateFromLeap(self, str):
+		self.str = str
+
+
 	def updateData(self, data):
 		#if data changed
 		#emit signal

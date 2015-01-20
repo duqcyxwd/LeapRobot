@@ -4,9 +4,8 @@ sys.path.insert(0, "./lib/")
 
 import Leap
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
-
+from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QMessageBox
 from PyQt5 import QtCore
-
 
 class leapListener(Leap.Listener):
 	def on_connect(self, controller):
@@ -15,23 +14,24 @@ class leapListener(Leap.Listener):
 
 	def on_frame(self, controller):
 		frame = controller.frame()
+		msg = ''
 
 		for hand in frame.hands:
-			handType = "Left hand" if hand.is_left else "Right hand"
 			if hand.is_left:
-				print "left"
-				# self.conl.stringSignal.emit("left")
-				self.conl[0] = "left"
+				handDir =  hand.direction.to_float_array()
+				msg += ",left,%i, %i, %i" % (int(handDir[0] * 100), int(handDir[1] * 100), int(handDir[2] * 100))
 			else:
-				self.conl[0] = "right"
-				print "right"
+				strength = hand.grab_strength
+				handPos = hand.palm_position.to_float_array()
+				msg += ",right,%i, %i, %i, %i" % (int(handPos[0] / 10), int(handPos[1] / 10), int(handPos[2] / 10), strength*10)
+			self.activity[0] = msg
 
 class LeapController(QtCore.QThread):
 	"""docstring for LeapController"""
- 	stringSignal = QtCore.pyqtSignal(['QString'])
+	leapUpdateSignal = QtCore.pyqtSignal(['QString'])
 
- 	message = ["msg"]
- 	oldmessage = 'msg'
+	message = ["msg"]
+	oldmessage = 'msg'
 
 	def __init__(self):
 		super(LeapController, self).__init__()
@@ -41,7 +41,7 @@ class LeapController(QtCore.QThread):
 
 	def run(self):
 
-		self._listener.conl = self.message
+		self._listener.activity = self.message
 		self._controller.add_listener(self._listener)
 
 		self._isRunning = True
@@ -56,7 +56,7 @@ class LeapController(QtCore.QThread):
 			if self.message[0] != self.oldmessage:
 				print "new incoming message"
 				self.oldmessage = self.message[0]
-				self.stringSignal.emit(self.message[0])
+				self.leapUpdateSignal.emit(self.message[0])
 				pass
 
 	def stopListen(self):
@@ -78,6 +78,7 @@ if __name__ == "__main__":
 		finally:
 			controlThread.stopListen()
 			controlThread.terminate()
+			sys.exit()
 
 		sys.exit(app.exec_())
 
