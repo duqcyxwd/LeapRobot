@@ -21,8 +21,8 @@ class LeapArm(QtCore.QObject):
 		self.carEntity = CarEntity()
 		self.mw.setCarEntity(self.carEntity)
 
-		self.startConnection()
-		self.initSockets()
+		# self.startConnection()
+		# self.initSockets()
 		
 
 		# self.connect(self.mw, QtCore.SIGNAL("startLeapSignal"), self, QtCore.SLOT("startLeapController()"))
@@ -61,7 +61,8 @@ class LeapArm(QtCore.QObject):
 		self.mw.addLog("start leap controller")
 		
 		self.leapControlThread = LeapController()
-		self.leapControlThread.stringSignal.connect(self.mw.updateLeapControllerLabel)
+		self.leapControlThread.leapUpdateSignalInlist.connect(self.carEntity.updateFromLeap)
+		self.leapControlThread.leapUpdateSignal.connect(self.mw.updateLeapControllerLabel)
 
 		# terminate application when leap controller killed
 		# self.leapControlThread.finished.connect(self.app.exit)
@@ -88,8 +89,22 @@ class LeapArm(QtCore.QObject):
 # startLeapSingnal
 # run
 def main():
-	mainwindow = LeapArm()
-	mainwindow.run()
+	leapArm = LeapArm()
+	leapArm.run()
+
 
 if __name__ == '__main__':
-	main()	
+
+	tt = True
+	if tt:
+		leapArm = LeapArm()
+
+		import time
+		time.sleep(1)
+		# leapArm.startLeapController()
+		# leapArm.startLeapController()
+		leapArm.mw.on_newtab_pressed()
+		leapArm.run()
+		pass
+	else:
+		main()	
