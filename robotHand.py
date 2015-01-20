@@ -40,9 +40,10 @@ class GLWidget(QGLWidget):
         self.handVertical = 0
         self.forward = 1
         self.speed = INITSPEED
-        self.gear1angle = 15.0 * math.pi / 180.0     # red body
-        self.gear2angle = -30.0 * math.pi / 180.0     # green body
-        self.gear3angle = 60.0 * math.pi / 180.0     # plier
+        self.gear1angle = INISERVOANGLE1 * math.pi / 180.0     # red body
+        self.gear2angle = INISERVOANGLE2 * math.pi / 180.0     # green body
+        self.gear3angle = INISERVOANGLE3 * math.pi / 180.0     # plier
+        self.gear4angle = INISERVOANGLE4 * math.pi / 180.0     # head
 
         self.gear1Rot = 0.0
         self.turn = 1
@@ -240,47 +241,6 @@ class GLWidget(QGLWidget):
     def advanceGears(self):
 
         self.gear1Rot += self.speed * 2 * 16
-
-        if self.gear1angle > 150.0 * math.pi / 180.0:
-            self.handHorizontal = 0
-        elif self.gear1angle < 15.0 * math.pi / 180.0:
-            self.handHorizontal = 0
-
-        if self.handHorizontal == 1 and self.gear1angle - self.gear2angle < 89.0 * math.pi / 180.0:
-            self.gear1angle += math.pi / 180.0
-
-        if self.handHorizontal == -1:
-            self.gear1angle -= math.pi / 180.0
-
-
-        if self.gear2angle > 90.0 * math.pi / 180.0:
-            self.handVertical = 0
-        elif self.gear2angle < -30.0 * math.pi / 180.0:
-            self.handVertical = 0
-
-        if self.handVertical == -1 and self.gear1angle - self.gear2angle < 89.0 * math.pi / 180.0:
-            self.gear2angle -= math.pi / 180.0
-
-        if self.handVertical == 1:
-            self.gear1angle += math.pi / 180.0
-
-
-        if self.gear3angle > 60.0 * math.pi / 180.0:
-            self.plierClosing = 0
-        elif self.gear3angle < 16.0 * math.pi / 180.0:
-            self.plierClosing = 0
-
-        if self.plierClosing == 1:
-            self.gear3angle += 2.0 * math.pi / 180.0
-        elif self.plierClosing == -1:
-            self.gear3angle -= 2.0 * math.pi / 180.0
-
-        if self.turn == 1:
-            self.tier1angle = 45.0 * math.pi / 180.0
-        elif self.turn == -1:
-            self.tier1angle = -45.0 * math.pi / 180.0
-
-
 
         self.updateGL()    
 
@@ -562,6 +522,24 @@ class GLWidget(QGLWidget):
 
     def updateGraph(self):
         self.speed = self.carEntity.getSpeed()
+
+        dirc = self.carEntity.getDirection()
+        if dirc == 0:
+            self.turn = 1
+            # dirstr = 'left'
+        elif dirc == 1:
+            self.turn = 0
+            # dirstr = 'straight'
+        elif dirc == 2:
+            self.turn = -1
+            # dirstr = 'right'
+
+        servo = self.carEntity.getServoAngle()
+        self.gear1angle = servo[0] * math.pi / 180.0
+        self.gear2angle = servo[1] * math.pi / 180.0
+        self.gear3angle = servo[2] * math.pi / 180.0
+        self.gear4angle = servo[3] * math.pi / 180.0
+
 
 
 

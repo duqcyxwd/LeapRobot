@@ -37,7 +37,6 @@ class ControlPage(base_class, form_class):
 	def setCarEntity(self, carEntity):
 		self.carEntity = carEntity
 
-
 		self.carEntity.updateSignal.connect(self.updateCarInterface)
 
 		self.inc.pressed.connect(self.carEntity.increaseSpeed)
