@@ -87,12 +87,12 @@ class GLWidget(QGLWidget):
         self.box2 = self.box(reflectance2, 7.0, 1.0, 0.1)    # green 1
         self.box3 = self.box(reflectance1, 9.0, 1.0, 0.1)    # red 2 connects plier
         self.box4 = self.box(reflectance2, 7.0, 1.0, 0.1)    # green 2
-        self.box5 = self.box(reflectance3, 4.0, 1.0, 0.5)    # bottom blue
+        self.box5 = self.box(reflectance3, 4.0, 1.0, 1.0)    # bottom blue
         self.box6 = self.box(reflectance3, 2.0, 1.0, 0.1)    # hand blue
         self.box7 = self.box(reflectance4, 2.0, 1.0, 0.1)    # hand yellow 1
         self.box8 = self.box(reflectance4, 2.0, 1.0, 0.1)    # hand yellow 2
-        self.box9 = self.box(reflectance5, 2.0, 1.0, 0.1)    # hand yellow 2
-        self.box10 = self.box(reflectance5, 2.0, 1.0, 0.1)    # hand yellow 2
+        self.box9 = self.box(reflectance5, 2.0, 0.2, 1.0)    # hand yellow 2
+        self.box10 = self.box(reflectance5, 2.0, 0.2, 1.0)    # hand yellow 2
 
         self.cylinder1 = self.cylinder(reflectance1, 0.5, 1.0)
         self.cylinder2 = self.cylinder(reflectance2, 0.5, 1.0)
@@ -103,19 +103,19 @@ class GLWidget(QGLWidget):
         self.cylinder7 = self.cylinder(reflectance2, 0.5, 1.0)
         self.cylinder8 = self.cylinder(reflectance1, 0.5, 1.0)
         self.cylinder9 = self.cylinder(reflectance3, 0.5, 1.0)
-        self.cylinder10 = self.cylinder(reflectance1, 0.5, 1.0)
-        self.cylinder11 = self.cylinder(reflectance3, 0.5, 1.0)
+        # self.cylinder1 = self.cylinder(reflectance1, 0.5, 1.0)
+        self.cylinder10 = self.cylinder(reflectance3, 0.5, 1.0)
 
         self.tire1 = self.tire(reflectance2, 2.0, 2.0, 1.0, 20)
         self.tire2 = self.tire(reflectance2, 2.0, 2.0, 1.0, 20)
         self.tire3 = self.tire(reflectance4, 2.0, 2.0, 1.0, 20)
         self.tire4 = self.tire(reflectance4, 2.0, 2.0, 1.0, 20)
 
-        self.cylinder12 = self.cylinder(reflectance3, 0.5, 1.0)
+        self.cylinder11 = self.cylinder(reflectance3, 0.5, 1.0)
+        self.cylinder12 = self.cylinder(reflectance5, 0.5, 1.0)
         self.cylinder13 = self.cylinder(reflectance5, 0.5, 1.0)
-        self.cylinder14 = self.cylinder(reflectance5, 0.5, 1.0)
 
-        self.box11 = self.box(reflectance1, 16.0, 3.0, 3.0)    # carbody
+        self.box11 = self.box(reflectance1, 16.0, 3.0, 6.0)    # carbody
 
         glEnable(GL_NORMALIZE)
         glClearColor(0.0, 0.0, 0.0, 1.0)
@@ -132,52 +132,43 @@ class GLWidget(QGLWidget):
         self.y1 = 3.0 * math.sin(self.gear1angle)
         self.x2 = -7.0 * math.sin(self.gear2angle)
         self.y2 = 7.0 * math.cos(self.gear2angle)
-        self.x3 = self.x1 + self.x2
-        self.y3 = self.y1 + self.y2
-        self.x4 = self.x2 - 2.0 * self.x1
-        self.y4 = self.y2 - 2.0 * self.y1
-        self.x5 = self.x4 - 2.0
-        self.y5 = -self.y4
-        self.x6 = self.x5 - 2.0 * math.cos(self.gear3angle)
-        self.y6 = -1.0 - 2.0 * math.sin(self.gear3angle)
-        self.y7 = -1.0 + 2.0 * math.sin(self.gear3angle)
 
-        self.drawBox(self.box1, 0.0, 0.0, 0.0, 180.0 / math.pi * self.gear1angle)
-        self.drawBox(self.box2, self.x1, self.y1, 1.0, 180.0 / math.pi * (math.pi / 2.0 + self.gear2angle))
-        self.drawBox(self.box3, self.x3, self.y3, 0.0, 180.0 / math.pi * (math.pi + self.gear1angle))
-        self.drawBox(self.box4, self.x2, self.y2, 1.0, 180.0 / math.pi *(math.pi / -2.0 + self.gear2angle))
-        self.drawBox(self.box5, 0.0, 0.0, -1.0, -90.0)
-        self.drawBox(self.box6, self.x4, self.y4, -1.0, 180.0)
+        self.drawBox(self.box1, 0.0, 0.0, 0.0, 180 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawBox(self.box2, self.x1, self.y1, 1.0, 180 / math.pi * (math.pi / 2.0 + self.gear2angle), 180.0 / math.pi * self.gear4angle, 0.0)
 
-        self.drawCylinder(self.cylinder1, 0.0, 0.0, 0.0)
-        self.drawCylinder(self.cylinder2, 0.0, 0.0, 1.0)
-        self.drawCylinder(self.cylinder3, self.x1, self.y1, 1.0)
-        self.drawCylinder(self.cylinder4, self.x1, self.y1, 0.0)
-        self.drawCylinder(self.cylinder5, self.x3, self.y3, 0.0)
-        self.drawCylinder(self.cylinder6, self.x3, self.y3, 1.0)
-        self.drawCylinder(self.cylinder7, self.x2, self.y2, 1.0)
-        self.drawCylinder(self.cylinder8, self.x2, self.y2, 0.0)
-        self.drawCylinder(self.cylinder9, 0.0, 0.0, -1.0)
-        self.drawCylinder(self.cylinder10, self.x4, self.y4, 0.0)
-        self.drawCylinder(self.cylinder11, self.x4, self.y4, -1.0)
+        self.drawBox(self.box3, self.x1 + self.x2, self.y1 + self.y2, 0.0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawBox(self.box4, 0.0, 0.0, 1.0,  180 / math.pi * (math.pi / 2.0 + self.gear2angle), 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawBox(self.box5, 0.0, 0.0, 0.0, -90.0, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawBox(self.box6, self.x2 - 2.0 * self.x1, self.y2 - 2.0 * self.y1,0.0, 180.0, 180.0 / math.pi * self.gear4angle, 0.0)
+        #
+        self.drawCylinder(self.cylinder1, 0.0, 0.0, 0.0, 0.0, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder2, 0.0, 0.0, 1.0, 0.0, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder3, self.x1, self.y1, 0.0, 180 / math.pi * (math.pi / 2.0 + self.gear2angle), 180.0 / math.pi * self.gear4angle, 0.0) # 0.0)
+        self.drawCylinder(self.cylinder4, self.x1, self.y1, 1.0, 180 / math.pi * (math.pi / 2.0 + self.gear2angle), 180.0 / math.pi * self.gear4angle, 0.0) # 0.0)
+        self.drawCylinder(self.cylinder5, self.x1 + self.x2, self.y1 + self.y2, 0.0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder6, self.x1 + self.x2, self.y1 + self.y2, 1.0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder7, self.x2, self.y2, 0.0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder8, self.x2, self.y2, 1.0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder9, 0.0, -4.0, 0.0, 0.0, 180.0 / math.pi * self.gear4angle, 0.0)
 
-        self.drawBox(self.box11, -6.0, -6.0, 0.0, 0.0)
+        self.drawBox(self.box7, self.x2 - 2.0 * self.x1 - 2.0, self.y2 - 2.0 * self.y1, 0.0, 180.0, 180.0 / math.pi * self.gear4angle, 180.0 / math.pi * self.gear3angle)
+        self.drawBox(self.box8, self.x2 - 2.0 * self.x1 - 2.0, self.y2 - 2.0 * self.y1, 0.0, 180.0, 180.0 / math.pi * self.gear4angle, -180.0 / math.pi * self.gear3angle)
+
+        self.drawCylinder(self.cylinder10, self.x2 - 2.0 * self.x1, self.y2 - 2.0 * self.y1, 0.0, 0.0, 180.0 / math.pi * self.gear4angle, 0.0)
+
+        self.drawBox(self.box9, self.x2 - 2.0 * self.x1 - 2.0 - 2.0 * math.cos(self.gear3angle), self.y2 - 2.0 * self.y1, -2.0 * math.sin(self.gear3angle), 180.0, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawBox(self.box10, self.x2 - 2.0 * self.x1 - 2.0 - 2.0 * math.cos(self.gear3angle), self.y2 - 2.0 * self.y1, 2.0 * math.sin(self.gear3angle), 180.0, 180.0 / math.pi * self.gear4angle, 0.0)
+
+        self.drawCylinder(self.cylinder11, self.x2 - 2.0 * self.x1 - 2.0, self.y2 - 2.0 * self.y1, 0.0, 0.0, 180.0 / math.pi * self.gear4angle, 90.0)
+        self.drawCylinder(self.cylinder12, self.x2 - 2.0 * self.x1 - 2.0 - 2.0 * math.cos(self.gear3angle), self.y2 - 2.0 * self.y1, -2.0 * math.sin(self.gear3angle), 0.0, 180.0 / math.pi * self.gear4angle, 90.0)
+        self.drawCylinder(self.cylinder13, self.x2 - 2.0 * self.x1 - 2.0 - 2.0 * math.cos(self.gear3angle), self.y2 - 2.0 * self.y1, 2.0 * math.sin(self.gear3angle), 0.0, 180.0 / math.pi * self.gear4angle, 90.0)
+
+        self.drawBox(self.box11, -6.0, -6.0, 0.0, 0.0, 0.0, 0.0)
 
         self.drawTire(self.tire1, -4.0, -8.0, 3.5, self.gear1Rot, self.tire1angle / math.pi * 180.0)
         self.drawTire(self.tire2, -4.0, -8.0, -3.5, self.gear1Rot, self.tire1angle / math.pi * 180.0)
         self.drawTire(self.tire3, 8.0, -8.0, 3.5, self.gear1Rot, 0.0)
         self.drawTire(self.tire4, 8.0, -8.0, -3.5, self.gear1Rot, 0.0)
-
-        glRotated(+90.0, 1.0, 0.0, 0.0)
-        # x = x, y = z, z = -y
-        self.drawCylinder(self.cylinder12, self.x5, -1.0, self.y5)
-        self.drawBox(self.box7, self.x5, -1.0, self.y5, 180.0 - self.gear3angle / math.pi * 180.0)
-        self.drawBox(self.box8, self.x5, -1.0, self.y5, 180.0 + self.gear3angle / math.pi * 180.0)
-        self.drawCylinder(self.cylinder13, self.x6, self.y6, self.y5)
-        self.drawCylinder(self.cylinder14, self.x6, self.y7, self.y5)
-        self.drawBox(self.box9, self.x6, self.y6, self.y5, 180.0)
-        self.drawBox(self.box10, self.x6, self.y7, self.y5, 180.0)
-
 
         glPopMatrix()
 
@@ -234,37 +225,38 @@ class GLWidget(QGLWidget):
         glBegin(GL_QUADS)
 
         r = width / 2.0
+        h = height / 2.0
 
-        glVertex3d(0.0, r, -height)
-        glVertex3d(0.0, -r, -height)
-        glVertex3d(length, -r, -height)
-        glVertex3d(length, r, -height)
+        glVertex3d(0.0, r, -h)
+        glVertex3d(0.0, -r, -h)
+        glVertex3d(length, -r, -h)
+        glVertex3d(length, r, -h)
 
-        glVertex3d(length, r , height)
-        glVertex3d(length, -r , height)
-        glVertex3d(0.0, -r , height)
-        glVertex3d(0.0, r , height)
+        glVertex3d(length, r , h)
+        glVertex3d(length, -r , h)
+        glVertex3d(0.0, -r , h)
+        glVertex3d(0.0, r , h)
 
 
-        glVertex3d(0.0, r, height)
-        glVertex3d(0.0, -r, height)
-        glVertex3d(0.0, -r, -height)
-        glVertex3d(0.0, r, -height)
+        glVertex3d(0.0, r, h)
+        glVertex3d(0.0, -r, h)
+        glVertex3d(0.0, -r, -h)
+        glVertex3d(0.0, r, -h)
 
-        glVertex3d(0.0, -r, height)
-        glVertex3d(length, -r, height)
-        glVertex3d(length, -r, -height)
-        glVertex3d(0.0, -r, -height)
+        glVertex3d(0.0, -r, h)
+        glVertex3d(length, -r, h)
+        glVertex3d(length, -r, -h)
+        glVertex3d(0.0, -r, -h)
 
-        glVertex3d(length, -r, height)
-        glVertex3d(length, r, height)
-        glVertex3d(length, r, -height)
-        glVertex3d(length, -r, -height)
+        glVertex3d(length, -r, h)
+        glVertex3d(length, r, h)
+        glVertex3d(length, r, -h)
+        glVertex3d(length, -r, -h)
 
-        glVertex3d(length, r, height)
-        glVertex3d(0.0, r, height)
-        glVertex3d(0.0, r, -height)
-        glVertex3d(length, r, -height)
+        glVertex3d(length, r, h)
+        glVertex3d(0.0, r, h)
+        glVertex3d(0.0, r, -h)
+        glVertex3d(length, r, -h)
 
         glEnd()
 
@@ -415,16 +407,21 @@ class GLWidget(QGLWidget):
 
         return list
 
-    def drawBox(self, box, dx, dy, dz, angle):
+    def drawBox(self, box, dx, dy, dz, angle, turnAngle, piterAngle):
         glPushMatrix()
+        glRotated(turnAngle, 0.0, 1.0, 0.0)
         glTranslated(dx, dy, dz)
         glRotated(angle, 0.0, 0.0, 1.0)
+        glRotated(piterAngle, 0.0, 1.0, 0.0)
         glCallList(box)
         glPopMatrix()
 
-    def drawCylinder(self, cylinder, dx, dy, dz):
+    def drawCylinder(self, cylinder, dx, dy, dz, angle, turnAngle, piterAngle):
         glPushMatrix()
+        glRotated(turnAngle, 0.0, 1.0, 0.0)
         glTranslated(dx, dy, dz)
+        glRotated(angle, 0.0, 0.0, 1.0)
+        glRotated(piterAngle, 1.0, 0.0, 0.0)
         glCallList(cylinder)
         glPopMatrix()
 
