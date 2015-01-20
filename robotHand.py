@@ -26,9 +26,9 @@ class GLWidget(QGLWidget):
     def __init__(self, parent=None):
         super(GLWidget, self).__init__(parent)
 
-        self.xRot = 0
-        self.yRot = 0
-        self.zRot = 0
+        self.xRot = 0   # initial angle of view
+        self.yRot = 0   # initial angle of view
+        self.zRot = 0   # initial angle of view
 
         self.speed = INITSPEED
         self.gear1angle = INISERVOANGLE1 * math.pi / 180.0     # red body
@@ -94,7 +94,6 @@ class GLWidget(QGLWidget):
         self.box9 = self.box(reflectance5, 2.0, 1.0, 0.1)    # hand yellow 2
         self.box10 = self.box(reflectance5, 2.0, 1.0, 0.1)    # hand yellow 2
 
-
         self.cylinder1 = self.cylinder(reflectance1, 0.5, 1.0)
         self.cylinder2 = self.cylinder(reflectance2, 0.5, 1.0)
         self.cylinder3 = self.cylinder(reflectance2, 0.5, 1.0)
@@ -125,9 +124,9 @@ class GLWidget(QGLWidget):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         glPushMatrix()
-        glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
-        glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
-        glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
+        glRotated(self.xRot, 1.0, 0.0, 0.0)
+        glRotated(self.yRot, 0.0, 1.0, 0.0)
+        glRotated(self.zRot, 0.0, 0.0, 1.0)
 
         self.x1 = 3.0 * math.cos(self.gear1angle)
         self.y1 = 3.0 * math.sin(self.gear1angle)
@@ -164,10 +163,10 @@ class GLWidget(QGLWidget):
 
         self.drawBox(self.box11, -6.0, -6.0, 0.0, 0.0)
 
-        self.drawTire(self.tire1, -4.0, -8.0, 3.5, self.gear1Rot / 16.0, self.tire1angle / math.pi * 180.0)
-        self.drawTire(self.tire2, -4.0, -8.0, -3.5, self.gear1Rot / 16.0, self.tire1angle / math.pi * 180.0)
-        self.drawTire(self.tire3, 8.0, -8.0, 3.5, self.gear1Rot / 16.0, 0.0)
-        self.drawTire(self.tire4, 8.0, -8.0, -3.5, self.gear1Rot / 16.0, 0.0)
+        self.drawTire(self.tire1, -4.0, -8.0, 3.5, self.gear1Rot, self.tire1angle / math.pi * 180.0)
+        self.drawTire(self.tire2, -4.0, -8.0, -3.5, self.gear1Rot, self.tire1angle / math.pi * 180.0)
+        self.drawTire(self.tire3, 8.0, -8.0, 3.5, self.gear1Rot, 0.0)
+        self.drawTire(self.tire4, 8.0, -8.0, -3.5, self.gear1Rot, 0.0)
 
         glRotated(+90.0, 1.0, 0.0, 0.0)
         # x = x, y = z, z = -y
@@ -214,7 +213,7 @@ class GLWidget(QGLWidget):
 
     def advanceGears(self):
 
-        self.gear1Rot += self.speed * 2 * 16
+        self.gear1Rot += self.speed * 2
 
         self.updateGL()    
 
@@ -439,10 +438,10 @@ class GLWidget(QGLWidget):
 
     def normalizeAngle(self, angle):
         while (angle < 0):
-            angle += 360 * 16
+            angle += 360
 
-        while (angle > 360 * 16):
-            angle -= 360 * 16
+        while (angle > 360):
+            angle -= 360
 
     def updateGraph(self):
         self.speed = self.carEntity.getSpeed()
