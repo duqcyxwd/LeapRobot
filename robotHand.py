@@ -34,16 +34,15 @@ class GLWidget(QGLWidget):
         self.xRot = 0
         self.yRot = 0
         self.zRot = 0
-        self.gear1Rot = 0 # tier
+
         self.speed = INITSPEED
         self.gear1angle = INISERVOANGLE1 * math.pi / 180.0     # red body
         self.gear2angle = INISERVOANGLE2 * math.pi / 180.0     # green body
         self.gear3angle = INISERVOANGLE3 * math.pi / 180.0     # plier
-        self.gear4angle = INISERVOANGLE4 * math.pi / 180.0     # plier
+        self.gear4angle = INISERVOANGLE4 * math.pi / 180.0     # head
 
-        self.gear1Rot = 0.0
-        self.turn = INITDIR
-        self.tier1angle = math.pi / 4.0
+        self.gear1Rot = 0.0 # tier
+        self.tire1angle = (INITDIR - 1) * math.pi / 4.0
 
         timer = QTimer(self)
         timer.timeout.connect(self.advanceGears)
@@ -76,83 +75,53 @@ class GLWidget(QGLWidget):
             self.zRotationChanged.emit(angle)
             self.updateGL()
 
-    def setHorizontalChange(self, angle):
-        while (angle < 0):
-            angle += 360 * 16
-
-        while (angle > 360 * 16):
-            angle -= 360 * 16
-
-        self.gear1angletemp = angle
-        self.horizontalChanged.emit(angle)
-
-    def setVerticalChange(self, angle):
-        while (angle < 0):
-            angle += 360 * 16
-
-        while (angle > 360 * 16):
-            angle -= 360 * 16
-
-        self.gear2angletemp = angle
-        self.verticalChanged.emit(angle)
-
-    def setPiterChange(self, angle):
-        while (angle < 0):
-            angle += 360 * 16
-
-        while (angle > 360 * 16):
-            angle -= 360 * 16
-
-        self.gear3angletemp = angle
-        self.piterChanged.emit(angle)
-
     def initializeGL(self):
         lightPos = (5.0, 5.0, 10.0, 1.0)
-        reflectance1 = (1.0, 0.0, 0.0, 1.0)
-        reflectance2 = (0.0, 1.0, 0.0, 1.0)
-        reflectance3 = (0.0, 0.0, 1.0, 1.0)
-        reflectance4 = (1.0, 1.0, 0.0, 1.0)
-        reflectance5 = (1.0, 0.0, 1.0, 1.0)
+        reflectance1 = (1.0, 0.0, 0.0, 1.0) # red
+        reflectance2 = (0.0, 1.0, 0.0, 1.0) # green
+        reflectance3 = (0.0, 0.0, 1.0, 1.0) # blue
+        reflectance4 = (1.0, 1.0, 0.0, 1.0) # yellow
+        reflectance5 = (1.0, 0.0, 1.0, 1.0) # purple
 
         glLightfv(GL_LIGHT0, GL_POSITION, lightPos)
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0)
         glEnable(GL_DEPTH_TEST)
 
-        self.box1 = self.box(reflectance1, 0.0, 0.0, 3.0, 1.0, 0.1, 0.0)    # red 1
-        self.box2 = self.box(reflectance2, 0.0, 0.0, 7.0, 1.0, 0.1, 0.0)    # green 1
-        self.box3 = self.box(reflectance1, 0.0, 0.0, 9.0, 1.0, 0.1, 0.0)    # red 2 connects plier
-        self.box4 = self.box(reflectance2, 0.0, 0.0, 7.0, 1.0, 0.1, 0.0)    # green 2
-        self.box5 = self.box(reflectance3, 0.0, 0.0, 4.0, 1.0, 0.5, 0.0)    # bottom blue
-        self.box6 = self.box(reflectance3, 0.0, 0.0, 2.0, 1.0, 0.1, 0.0)    # hand blue
-        self.box7 = self.box(reflectance4, 0.0, 0.0, 2.0, 1.0, 0.1, 0.0)    # hand yellow 1
-        self.box8 = self.box(reflectance4, 0.0, 0.0, 2.0, 1.0, 0.1, 0.0)    # hand yellow 2
-        self.box9 = self.box(reflectance5, 0.0, 0.0, 2.0, 1.0, 0.1, 0.0)    # hand yellow 2
-        self.box10 = self.box(reflectance5, 0.0, 0.0, 2.0, 1.0, 0.1, 0.0)    # hand yellow 2
+        self.box1 = self.box(reflectance1, 3.0, 1.0, 0.1)    # red 1
+        self.box2 = self.box(reflectance2, 7.0, 1.0, 0.1)    # green 1
+        self.box3 = self.box(reflectance1, 9.0, 1.0, 0.1)    # red 2 connects plier
+        self.box4 = self.box(reflectance2, 7.0, 1.0, 0.1)    # green 2
+        self.box5 = self.box(reflectance3, 4.0, 1.0, 0.5)    # bottom blue
+        self.box6 = self.box(reflectance3, 2.0, 1.0, 0.1)    # hand blue
+        self.box7 = self.box(reflectance4, 2.0, 1.0, 0.1)    # hand yellow 1
+        self.box8 = self.box(reflectance4, 2.0, 1.0, 0.1)    # hand yellow 2
+        self.box9 = self.box(reflectance5, 2.0, 1.0, 0.1)    # hand yellow 2
+        self.box10 = self.box(reflectance5, 2.0, 1.0, 0.1)    # hand yellow 2
 
 
-        self.cylinder1 = self.cylinder(reflectance1, 0.0, 0.5, 1.0, 0.0, 10000)
-        self.cylinder2 = self.cylinder(reflectance2, 0.0, 0.5, 1.0, 0.0, 10000)
-        self.cylinder3 = self.cylinder(reflectance2, 0.0, 0.5, 1.0, 0.0, 10000)
-        self.cylinder4 = self.cylinder(reflectance1, 0.0, 0.5, 1.0, 0.0, 10000)
-        self.cylinder5 = self.cylinder(reflectance1, 0.0, 0.5, 1.0, 0.0, 10000)
-        self.cylinder6 = self.cylinder(reflectance2, 0.0, 0.5, 1.0, 0.0, 10000)
-        self.cylinder7 = self.cylinder(reflectance2, 0.0, 0.5, 1.0, 0.0, 10000)
-        self.cylinder8 = self.cylinder(reflectance1, 0.0, 0.5, 1.0, 0.0, 10000)
-        self.cylinder9 = self.cylinder(reflectance3, 0.0, 0.5, 1.0, 0.0, 10000)
-        self.cylinder10 = self.cylinder(reflectance1, 0.0, 0.5, 1.0, 0.0, 10000)
-        self.cylinder11 = self.cylinder(reflectance3, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder1 = self.cylinder(reflectance1, 0.5, 1.0)
+        self.cylinder2 = self.cylinder(reflectance2, 0.5, 1.0)
+        self.cylinder3 = self.cylinder(reflectance2, 0.5, 1.0)
+        self.cylinder4 = self.cylinder(reflectance1, 0.5, 1.0)
+        self.cylinder5 = self.cylinder(reflectance1, 0.5, 1.0)
+        self.cylinder6 = self.cylinder(reflectance2, 0.5, 1.0)
+        self.cylinder7 = self.cylinder(reflectance2, 0.5, 1.0)
+        self.cylinder8 = self.cylinder(reflectance1, 0.5, 1.0)
+        self.cylinder9 = self.cylinder(reflectance3, 0.5, 1.0)
+        self.cylinder10 = self.cylinder(reflectance1, 0.5, 1.0)
+        self.cylinder11 = self.cylinder(reflectance3, 0.5, 1.0)
 
-        self.tier1 = self.tier(reflectance2, 0.0, 2.0, 2.0, 1.0, 20)
-        self.tier2 = self.tier(reflectance2, 0.0, 2.0, 2.0, 1.0, 20)
-        self.tier3 = self.tier(reflectance4, 0.0, 2.0, 2.0, 1.0, 20)
-        self.tier4 = self.tier(reflectance4, 0.0, 2.0, 2.0, 1.0, 20)
+        self.tire1 = self.tire(reflectance2, 2.0, 2.0, 1.0, 20)
+        self.tire2 = self.tire(reflectance2, 2.0, 2.0, 1.0, 20)
+        self.tire3 = self.tire(reflectance4, 2.0, 2.0, 1.0, 20)
+        self.tire4 = self.tire(reflectance4, 2.0, 2.0, 1.0, 20)
 
-        self.cylinder12 = self.cylinder(reflectance3, 0.0, 0.5, 1.0, 0.0, 10000)
-        self.cylinder13 = self.cylinder(reflectance5, 0.0, 0.5, 1.0, 0.0, 10000)
-        self.cylinder14 = self.cylinder(reflectance5, 0.0, 0.5, 1.0, 0.0, 10000)
+        self.cylinder12 = self.cylinder(reflectance3, 0.5, 1.0)
+        self.cylinder13 = self.cylinder(reflectance5, 0.5, 1.0)
+        self.cylinder14 = self.cylinder(reflectance5, 0.5, 1.0)
 
-        self.box11 = self.box(reflectance1, -6.0, -6.0, 16.0, 3.0, 3.0, 0.0)    # car 1
+        self.box11 = self.box(reflectance1, 16.0, 3.0, 3.0)    # carbody
 
         glEnable(GL_NORMALIZE)
         glClearColor(0.0, 0.0, 0.0, 1.0)
@@ -165,39 +134,39 @@ class GLWidget(QGLWidget):
         glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 
-        self.drawBox(self.box1, 0.0, 0.0, 0.0, 180 / math.pi * self.gear1angle)
-        self.drawBox(self.box2, 3.0 * math.cos(self.gear1angle), 3.0 * math.sin(self.gear1angle), 1.0,180 / math.pi * (math.pi / 2.0 + self.gear2angle))
-        self.drawBox(self.box3, 3.0 * math.cos(self.gear1angle) - 7.0 * math.sin(self.gear2angle), 3.0 * math.sin(self.gear1angle) + 7.0 * math.cos(self.gear2angle), 0.0, 180 / math.pi * (math.pi + self.gear1angle))
-        self.drawBox(self.box4, -7.0 * math.sin(self.gear2angle), 7.0 * math.cos(self.gear2angle), 1.0, 180 / math.pi *(math.pi / -2.0 + self.gear2angle))
+        self.drawBox(self.box1, 0.0, 0.0, 0.0, 180.0 / math.pi * self.gear1angle)
+        self.drawBox(self.box2, 3.0 * math.cos(self.gear1angle), 3.0 * math.sin(self.gear1angle), 1.0,180.0 / math.pi * (math.pi / 2.0 + self.gear2angle))
+        self.drawBox(self.box3, 3.0 * math.cos(self.gear1angle) - 7.0 * math.sin(self.gear2angle), 3.0 * math.sin(self.gear1angle) + 7.0 * math.cos(self.gear2angle), 0.0, 180.0 / math.pi * (math.pi + self.gear1angle))
+        self.drawBox(self.box4, -7.0 * math.sin(self.gear2angle), 7.0 * math.cos(self.gear2angle), 1.0, 180.0 / math.pi *(math.pi / -2.0 + self.gear2angle))
         self.drawBox(self.box5, 0.0, 0.0, -1.0, -90.0)
         self.drawBox(self.box6, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)), 21.0 * math.cos(self.gear2angle) - (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)) , -1.0, 180.0)
 
-        self.drawCylinder(self.cylinder1, 0.0, 0.0, 0.0, 0.0)
-        self.drawCylinder(self.cylinder2, 0.0, 0.0, 1.0, 0.0)
-        self.drawCylinder(self.cylinder3, 3.0 * math.cos(self.gear1angle), 3.0 * math.sin(self.gear1angle), 1.0, 0.0)
-        self.drawCylinder(self.cylinder4, 3.0 * math.cos(self.gear1angle), 3.0 * math.sin(self.gear1angle), 0.0, 0.0)
-        self.drawCylinder(self.cylinder5, 3.0 * math.cos(self.gear1angle) - 7.0 * math.sin(self.gear2angle), 3.0 * math.sin(self.gear1angle) + 7.0 * math.cos(self.gear2angle), 0.0, 0.0)
-        self.drawCylinder(self.cylinder6, 3.0 * math.cos(self.gear1angle) - 7.0 * math.sin(self.gear2angle), 3.0 * math.sin(self.gear1angle) + 7.0 * math.cos(self.gear2angle), 1.0, 0.0)
-        self.drawCylinder(self.cylinder7, -7.0 * math.sin(self.gear2angle), 7.0 * math.cos(self.gear2angle), 1.0, 0.0)
-        self.drawCylinder(self.cylinder8, -7.0 * math.sin(self.gear2angle), 7.0 * math.cos(self.gear2angle), 0.0, 0.0)
-        self.drawCylinder(self.cylinder9, 0.0, 0.0, -1.0, 0.0)
-        self.drawCylinder(self.cylinder10, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)), 21.0 * math.cos(self.gear2angle) - (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 0.0, 0.0)
-        self.drawCylinder(self.cylinder11, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)), 21.0 * math.cos(self.gear2angle) - (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), -1.0, 0.0)
+        self.drawCylinder(self.cylinder1, 0.0, 0.0, 0.0)
+        self.drawCylinder(self.cylinder2, 0.0, 0.0, 1.0)
+        self.drawCylinder(self.cylinder3, 3.0 * math.cos(self.gear1angle), 3.0 * math.sin(self.gear1angle), 1.0)
+        self.drawCylinder(self.cylinder4, 3.0 * math.cos(self.gear1angle), 3.0 * math.sin(self.gear1angle), 0.0)
+        self.drawCylinder(self.cylinder5, 3.0 * math.cos(self.gear1angle) - 7.0 * math.sin(self.gear2angle), 3.0 * math.sin(self.gear1angle) + 7.0 * math.cos(self.gear2angle), 0.0)
+        self.drawCylinder(self.cylinder6, 3.0 * math.cos(self.gear1angle) - 7.0 * math.sin(self.gear2angle), 3.0 * math.sin(self.gear1angle) + 7.0 * math.cos(self.gear2angle), 1.0)
+        self.drawCylinder(self.cylinder7, -7.0 * math.sin(self.gear2angle), 7.0 * math.cos(self.gear2angle), 1.0)
+        self.drawCylinder(self.cylinder8, -7.0 * math.sin(self.gear2angle), 7.0 * math.cos(self.gear2angle), 0.0)
+        self.drawCylinder(self.cylinder9, 0.0, 0.0, -1.0)
+        self.drawCylinder(self.cylinder10, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)), 21.0 * math.cos(self.gear2angle) - (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 0.0)
+        self.drawCylinder(self.cylinder11, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)), 21.0 * math.cos(self.gear2angle) - (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), -1.0)
 
-        self.drawBox(self.box11, 0.0, 0.0, 0.0, 0.0)
+        self.drawBox(self.box11, -6.0, -6.0, 0.0, 0.0)
 
-        self.drawTier(self.tier1, -4.0, -8.0, 3.5, self.gear1Rot / 16.0, self.tier1angle / math.pi * 180.0)
-        self.drawTier(self.tier2, -4.0, -8.0, -3.5, self.gear1Rot / 16.0, self.tier1angle / math.pi * 180.0)
-        self.drawTier(self.tier3, 8.0, -8.0, 3.5, self.gear1Rot / 16.0, 0.0)
-        self.drawTier(self.tier4, 8.0, -8.0, -3.5, self.gear1Rot / 16.0, 0.0)
+        self.drawTire(self.tire1, -4.0, -8.0, 3.5, self.gear1Rot / 16.0, self.tire1angle / math.pi * 180.0)
+        self.drawTire(self.tire2, -4.0, -8.0, -3.5, self.gear1Rot / 16.0, self.tire1angle / math.pi * 180.0)
+        self.drawTire(self.tire3, 8.0, -8.0, 3.5, self.gear1Rot / 16.0, 0.0)
+        self.drawTire(self.tire4, 8.0, -8.0, -3.5, self.gear1Rot / 16.0, 0.0)
 
         glRotated(+90.0, 1.0, 0.0, 0.0)
         # x = x, y = z, z = -y
-        self.drawCylinder(self.cylinder12, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0, -1.0, -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 0.0)
+        self.drawCylinder(self.cylinder12, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0, -1.0, -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)))
         self.drawBox(self.box7, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0, -1.0, -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 180.0 - self.gear3angle / math.pi * 180.0)
         self.drawBox(self.box8, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0, -1.0, -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 180.0 + self.gear3angle / math.pi * 180.0)
-        self.drawCylinder(self.cylinder13, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 - 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 0.0)
-        self.drawCylinder(self.cylinder14, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 + 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 0.0)
+        self.drawCylinder(self.cylinder13, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 - 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)))
+        self.drawCylinder(self.cylinder14, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 + 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)))
         self.drawBox(self.box9, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 - 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 180.0)
         self.drawBox(self.box10, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 + 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 180.0)
 
@@ -238,13 +207,6 @@ class GLWidget(QGLWidget):
 
         self.gear1Rot += self.speed * 2 * 16
 
-        if self.turn == 0:
-            self.tier1angle = 45.0 * math.pi / 180.0
-        elif self.turn == 1:
-            self.tier1angle = 0.0
-        elif self.turn == 2:
-            self.tier1angle = -45.0 * math.pi / 180.0
-
         self.updateGL()    
 
     def xRotation(self):
@@ -256,7 +218,7 @@ class GLWidget(QGLWidget):
     def zRotation(self):
         return self.zRot
 
-    def box(self, reflectance, x1, y1, length, width, height, angle):
+    def box(self, reflectance, length, width, height):
         list = glGenLists(1)
         glNewList(list, GL_COMPILE)
         glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, reflectance)
@@ -265,36 +227,36 @@ class GLWidget(QGLWidget):
 
         r = width / 2.0
 
-        glVertex3d(x1 - r * math.sin(angle), y1 + r * math.cos(angle), -height)
-        glVertex3d(x1 + r * math.sin(angle), y1 - r * math.cos(angle), -height)
-        glVertex3d(x1 + length * math.cos(angle) + r * math.sin(angle), y1 + length * math.sin(angle) - r * math.cos(angle), -height)
-        glVertex3d(x1 + length * math.cos(angle) - r * math.sin(angle), y1 + length * math.sin(angle) + r * math.cos(angle), -height)
+        glVertex3d(0.0, r, -height)
+        glVertex3d(0.0, -r, -height)
+        glVertex3d(length, -r, -height)
+        glVertex3d(length, r, -height)
 
-        glVertex3d(x1 + length * math.cos(angle) - r * math.sin(angle), y1 + length * math.sin(angle) + r * math.cos(angle), +height)
-        glVertex3d(x1 + length * math.cos(angle) + r * math.sin(angle), y1 + length * math.sin(angle) - r * math.cos(angle), +height)
-        glVertex3d(x1 + r * math.sin(angle), y1 - r * math.cos(angle), +height)
-        glVertex3d(x1 - r * math.sin(angle), y1 + r * math.cos(angle), +height)
+        glVertex3d(length, r , height)
+        glVertex3d(length, -r , height)
+        glVertex3d(0.0, -r , height)
+        glVertex3d(0.0, r , height)
 
 
-        glVertex3d(x1 - r * math.sin(angle), y1 + r * math.cos(angle), +height)
-        glVertex3d(x1 + r * math.sin(angle), y1 - r * math.cos(angle), +height)
-        glVertex3d(x1 + r * math.sin(angle), y1 - r * math.cos(angle), -height)
-        glVertex3d(x1 - r * math.sin(angle), y1 + r * math.cos(angle), -height)
+        glVertex3d(0.0, r, height)
+        glVertex3d(0.0, -r, height)
+        glVertex3d(0.0, -r, -height)
+        glVertex3d(0.0, r, -height)
 
-        glVertex3d(x1 + r * math.sin(angle), y1 - r * math.cos(angle), +height)
-        glVertex3d(x1 + length * math.cos(angle) + r * math.sin(angle), y1 + length * math.sin(angle) - r * math.cos(angle), +height)
-        glVertex3d(x1 + length * math.cos(angle) + r * math.sin(angle), y1 + length * math.sin(angle) - r * math.cos(angle), -height)
-        glVertex3d(x1 + r * math.sin(angle), y1 - r * math.cos(angle), -height)
+        glVertex3d(0.0, -r, height)
+        glVertex3d(length, -r, height)
+        glVertex3d(length, -r, -height)
+        glVertex3d(0.0, -r, -height)
 
-        glVertex3d(x1 + length * math.cos(angle) + r * math.sin(angle), y1 + length * math.sin(angle) - r * math.cos(angle), +height)
-        glVertex3d(x1 + length * math.cos(angle) - r * math.sin(angle), y1 + length * math.sin(angle) + r * math.cos(angle), +height)
-        glVertex3d(x1 + length * math.cos(angle) - r * math.sin(angle), y1 + length * math.sin(angle) + r * math.cos(angle), -height)
-        glVertex3d(x1 + length * math.cos(angle) + r * math.sin(angle), y1 + length * math.sin(angle) - r * math.cos(angle), -height)
+        glVertex3d(length, -r, height)
+        glVertex3d(length, r, height)
+        glVertex3d(length, r, -height)
+        glVertex3d(length, -r, -height)
 
-        glVertex3d(x1 + length * math.cos(angle) - r * math.sin(angle), y1 + length * math.sin(angle) + r * math.cos(angle), +height)
-        glVertex3d(x1 - r * math.sin(angle), y1 + r * math.cos(angle), +height)
-        glVertex3d(x1 - r * math.sin(angle), y1 + r * math.cos(angle), -height)
-        glVertex3d(x1 + length * math.cos(angle) - r * math.sin(angle), y1 + length * math.sin(angle) + r * math.cos(angle), -height)
+        glVertex3d(length, r, height)
+        glVertex3d(0.0, r, height)
+        glVertex3d(0.0, r, -height)
+        glVertex3d(length, r, -height)
 
         glEnd()
 
@@ -302,15 +264,14 @@ class GLWidget(QGLWidget):
 
         return list
 
-    def cylinder(self, reflectance, innerRadius, outerRadius, thickness, toothSize, toothCount):
+    def cylinder(self, reflectance, outerRadius, thickness):
         list = glGenLists(1)
         glNewList(list, GL_COMPILE)
         glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, reflectance)
 
-        r0 = 0
         r1 = outerRadius
 
-        delta = (2.0 * math.pi / toothCount) / 4.0
+        delta = (2.0 * math.pi / 50) / 4.0
         z = thickness / 2.0
 
         glShadeModel(GL_FLAT)
@@ -325,20 +286,20 @@ class GLWidget(QGLWidget):
 
             glBegin(GL_QUAD_STRIP)
 
-            for j in range(toothCount):
-                angle = 2.0 * math.pi * j / toothCount
-                glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), sign * z)
+            for j in range(50):
+                angle = 2.0 * math.pi * j / 50
+                glVertex3d(0.0, 0.0, sign * z)
                 glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), sign * z)
-                glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), sign * z)
+                glVertex3d(0.0, 0.0, sign * z)
                 glVertex3d(r1 * math.cos(angle + 3 * delta), r1 * math.sin(angle + 3 * delta), sign * z)
 
             glEnd()
 
         glBegin(GL_QUAD_STRIP)
 
-        for i in range(toothCount):
+        for i in range(50):
 
-                angle = 2.0 * math.pi * i / toothCount
+                angle = 2.0 * math.pi * i / 50
                 s1 = r1
 
                 glVertex3d(s1 * math.cos(angle), s1 * math.sin(angle), +z)
@@ -354,11 +315,11 @@ class GLWidget(QGLWidget):
 
         glBegin(GL_QUAD_STRIP)
 
-        for i in range(toothCount+1):
-            angle = i * 2.0 * math.pi / toothCount
+        for i in range(51):
+            angle = i * 2.0 * math.pi / 50
             glNormal3d(-math.cos(angle), -math.sin(angle), 0.0)
-            glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), +z)
-            glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), -z)
+            glVertex3d(0.0, 0.0, +z)
+            glVertex3d(0.0, 0.0, -z)
 
         glEnd()
 
@@ -366,12 +327,11 @@ class GLWidget(QGLWidget):
 
         return list
 
-    def tier(self, reflectance, innerRadius, outerRadius, thickness, toothSize, toothCount):
+    def tire(self, reflectance, outerRadius, thickness, toothSize, toothCount):
         list = glGenLists(1)
         glNewList(list, GL_COMPILE)
         glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, reflectance)
 
-        r0 = innerRadius
         r1 = outerRadius - toothSize / 2.0
         r2 = outerRadius + toothSize / 2.0
         delta = (2.0 * math.pi / toothCount) / 4.0
@@ -391,9 +351,9 @@ class GLWidget(QGLWidget):
 
             for j in range(toothCount+1):
                 angle = 2.0 * math.pi * j / toothCount
-                glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), sign * z)
+                glVertex3d(0.0, 0.0, sign * z)
                 glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), sign * z)
-                glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), sign * z)
+                glVertex3d(0.0, 0.0, sign * z)
                 glVertex3d(r1 * math.cos(angle + 3 * delta), r1 * math.sin(angle + 3 * delta), sign * z)
 
             glEnd()
@@ -439,8 +399,8 @@ class GLWidget(QGLWidget):
         for i in range(toothCount+1):
             angle = i * 2.0 * math.pi / toothCount
             glNormal3d(-math.cos(angle), -math.sin(angle), 0.0)
-            glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), +z)
-            glVertex3d(r0 * math.cos(angle), r0 * math.sin(angle), -z)
+            glVertex3d(0.0, 0.0, +z)
+            glVertex3d(0.0, 0.0, -z)
 
         glEnd()
 
@@ -455,14 +415,13 @@ class GLWidget(QGLWidget):
         glCallList(box)
         glPopMatrix()
 
-    def drawCylinder(self, cylinder, dx, dy, dz, angle):
+    def drawCylinder(self, cylinder, dx, dy, dz):
         glPushMatrix()
         glTranslated(dx, dy, dz)
-        glRotated(angle, 0.0, 1.0, 0.0)
         glCallList(cylinder)
         glPopMatrix()
 
-    def drawTier(self, gear, dx, dy, dz, angle, turnAngle):
+    def drawTire(self, gear, dx, dy, dz, angle, turnAngle):
         glPushMatrix()
         glTranslated(dx, dy, dz)
         glRotated(turnAngle, 0.0, 1.0, 0.0)
@@ -483,13 +442,13 @@ class GLWidget(QGLWidget):
 
         dirc = self.carEntity.getDirection()
         if dirc == 0:
-            self.turn = 0
+            self.tire1angle = 45.0 * math.pi / 180.0
             # dirstr = 'left'
         elif dirc == 1:
-            self.turn = 1
+            self.tire1angle = 0.0
             # dirstr = 'straight'
         elif dirc == 2:
-            self.turn = 2
+            self.tire1angle = -45.0 * math.pi / 180.0
             # dirstr = 'right'
 
         servo = self.carEntity.getServoAngle()
