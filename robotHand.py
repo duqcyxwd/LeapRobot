@@ -35,18 +35,14 @@ class GLWidget(QGLWidget):
         self.yRot = 0
         self.zRot = 0
         self.gear1Rot = 0 # tier
-        self.plierClosing = -1
-        self.handHorizontal = 0
-        self.handVertical = 0
-        self.forward = 1
         self.speed = INITSPEED
         self.gear1angle = INISERVOANGLE1 * math.pi / 180.0     # red body
         self.gear2angle = INISERVOANGLE2 * math.pi / 180.0     # green body
         self.gear3angle = INISERVOANGLE3 * math.pi / 180.0     # plier
-        self.gear4angle = INISERVOANGLE4 * math.pi / 180.0     # head
+        self.gear4angle = INISERVOANGLE4 * math.pi / 180.0     # plier
 
         self.gear1Rot = 0.0
-        self.turn = 1
+        self.turn = INITDIR
         self.tier1angle = math.pi / 4.0
 
         timer = QTimer(self)
@@ -241,6 +237,13 @@ class GLWidget(QGLWidget):
     def advanceGears(self):
 
         self.gear1Rot += self.speed * 2 * 16
+
+        if self.turn == 0:
+            self.tier1angle = 45.0 * math.pi / 180.0
+        elif self.turn == 1:
+            self.tier1angle = 0.0
+        elif self.turn == 2:
+            self.tier1angle = -45.0 * math.pi / 180.0
 
         self.updateGL()    
 
@@ -475,63 +478,18 @@ class GLWidget(QGLWidget):
         while (angle > 360 * 16):
             angle -= 360 * 16
 
-    def turnLeft(self):
-        self.turn = 1
-
-    def turnRight(self):
-        self.turn = -1
-
-    def turnDefault(self):
-        self.turn = 0
-
-    def moveForward(self):
-        self.forward = 1
-
-    def moveBackward(self):
-        self.forward = -1
-
-    def moveDefault(self):
-        self.forward = 0
-
-    def plierClose(self):
-        self.plierClosing = 1
-
-    def plierOpen(self):
-        self.plierClosing = -1
-
-    def plierDefault(self):
-        self.plierClosing = 0
-
-    def handForward(self):
-        self.handHorizontal = 1
-
-    def handBackward(self):
-        self.handHorizontal = -1
-
-    def handHorizontalDefault(self):
-        self.handHorizontal = 0
-
-    def handHigher(self):
-        self.handVertical = 1
-
-    def handLower(self):
-        self.handVertical = -1
-
-    def handVerticalDefault(self):
-        self.handVertical = 0
-
     def updateGraph(self):
         self.speed = self.carEntity.getSpeed()
 
         dirc = self.carEntity.getDirection()
         if dirc == 0:
-            self.turn = 1
+            self.turn = 0
             # dirstr = 'left'
         elif dirc == 1:
-            self.turn = 0
+            self.turn = 1
             # dirstr = 'straight'
         elif dirc == 2:
-            self.turn = -1
+            self.turn = 2
             # dirstr = 'right'
 
         servo = self.carEntity.getServoAngle()
