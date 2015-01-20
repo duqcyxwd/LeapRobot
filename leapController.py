@@ -25,12 +25,15 @@ class leapListener(Leap.Listener):
 				handPos = hand.palm_position.to_float_array()
 				msg += ",right,%i, %i, %i, %i" % (int(handPos[0] / 10), int(handPos[1] / 10), int(handPos[2] / 10), strength*10)
 			self.activity[0] = msg
+			self.activity[1] = []
 
 class LeapController(QtCore.QThread):
 	"""docstring for LeapController"""
 	leapUpdateSignal = QtCore.pyqtSignal(['QString'])
+	leapUpdateSignalInlist = QtCore.pyqtSignal([list])
 
-	message = ["msg"]
+
+	message = ["msg", []]
 	oldmessage = 'msg'
 
 	def __init__(self):
@@ -57,6 +60,7 @@ class LeapController(QtCore.QThread):
 				print "new incoming message"
 				self.oldmessage = self.message[0]
 				self.leapUpdateSignal.emit(self.message[0])
+				self.leapUpdateSignalInlist.emit(self.message[1])
 				pass
 
 	def stopListen(self):
