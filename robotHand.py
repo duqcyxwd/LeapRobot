@@ -26,11 +26,6 @@ class GLWidget(QGLWidget):
     def __init__(self, parent=None):
         super(GLWidget, self).__init__(parent)
 
-        self.box1 = 0
-        self.cylinder1 = 0
-        self.gear1 = 0
-        self.gear2 = 0
-        self.gear3 = 0
         self.xRot = 0
         self.yRot = 0
         self.zRot = 0
@@ -134,24 +129,38 @@ class GLWidget(QGLWidget):
         glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 
+        self.x1 = 3.0 * math.cos(self.gear1angle)
+        self.y1 = 3.0 * math.sin(self.gear1angle)
+        self.x2 = -7.0 * math.sin(self.gear2angle)
+        self.y2 = 7.0 * math.cos(self.gear2angle)
+        self.x3 = self.x1 + self.x2
+        self.y3 = self.y1 + self.y2
+        self.x4 = self.x2 - 2.0 * self.x1
+        self.y4 = self.y2 - 2.0 * self.y1
+        self.x5 = self.x4 - 2.0
+        self.y5 = -self.y4
+        self.x6 = self.x5 - 2.0 * math.cos(self.gear3angle)
+        self.y6 = -1.0 - 2.0 * math.sin(self.gear3angle)
+        self.y7 = -1.0 + 2.0 * math.sin(self.gear3angle)
+
         self.drawBox(self.box1, 0.0, 0.0, 0.0, 180.0 / math.pi * self.gear1angle)
-        self.drawBox(self.box2, 3.0 * math.cos(self.gear1angle), 3.0 * math.sin(self.gear1angle), 1.0,180.0 / math.pi * (math.pi / 2.0 + self.gear2angle))
-        self.drawBox(self.box3, 3.0 * math.cos(self.gear1angle) - 7.0 * math.sin(self.gear2angle), 3.0 * math.sin(self.gear1angle) + 7.0 * math.cos(self.gear2angle), 0.0, 180.0 / math.pi * (math.pi + self.gear1angle))
-        self.drawBox(self.box4, -7.0 * math.sin(self.gear2angle), 7.0 * math.cos(self.gear2angle), 1.0, 180.0 / math.pi *(math.pi / -2.0 + self.gear2angle))
+        self.drawBox(self.box2, self.x1, self.y1, 1.0, 180.0 / math.pi * (math.pi / 2.0 + self.gear2angle))
+        self.drawBox(self.box3, self.x3, self.y3, 0.0, 180.0 / math.pi * (math.pi + self.gear1angle))
+        self.drawBox(self.box4, self.x2, self.y2, 1.0, 180.0 / math.pi *(math.pi / -2.0 + self.gear2angle))
         self.drawBox(self.box5, 0.0, 0.0, -1.0, -90.0)
-        self.drawBox(self.box6, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)), 21.0 * math.cos(self.gear2angle) - (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)) , -1.0, 180.0)
+        self.drawBox(self.box6, self.x4, self.y4, -1.0, 180.0)
 
         self.drawCylinder(self.cylinder1, 0.0, 0.0, 0.0)
         self.drawCylinder(self.cylinder2, 0.0, 0.0, 1.0)
-        self.drawCylinder(self.cylinder3, 3.0 * math.cos(self.gear1angle), 3.0 * math.sin(self.gear1angle), 1.0)
-        self.drawCylinder(self.cylinder4, 3.0 * math.cos(self.gear1angle), 3.0 * math.sin(self.gear1angle), 0.0)
-        self.drawCylinder(self.cylinder5, 3.0 * math.cos(self.gear1angle) - 7.0 * math.sin(self.gear2angle), 3.0 * math.sin(self.gear1angle) + 7.0 * math.cos(self.gear2angle), 0.0)
-        self.drawCylinder(self.cylinder6, 3.0 * math.cos(self.gear1angle) - 7.0 * math.sin(self.gear2angle), 3.0 * math.sin(self.gear1angle) + 7.0 * math.cos(self.gear2angle), 1.0)
-        self.drawCylinder(self.cylinder7, -7.0 * math.sin(self.gear2angle), 7.0 * math.cos(self.gear2angle), 1.0)
-        self.drawCylinder(self.cylinder8, -7.0 * math.sin(self.gear2angle), 7.0 * math.cos(self.gear2angle), 0.0)
+        self.drawCylinder(self.cylinder3, self.x1, self.y1, 1.0)
+        self.drawCylinder(self.cylinder4, self.x1, self.y1, 0.0)
+        self.drawCylinder(self.cylinder5, self.x3, self.y3, 0.0)
+        self.drawCylinder(self.cylinder6, self.x3, self.y3, 1.0)
+        self.drawCylinder(self.cylinder7, self.x2, self.y2, 1.0)
+        self.drawCylinder(self.cylinder8, self.x2, self.y2, 0.0)
         self.drawCylinder(self.cylinder9, 0.0, 0.0, -1.0)
-        self.drawCylinder(self.cylinder10, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)), 21.0 * math.cos(self.gear2angle) - (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 0.0)
-        self.drawCylinder(self.cylinder11, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)), 21.0 * math.cos(self.gear2angle) - (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), -1.0)
+        self.drawCylinder(self.cylinder10, self.x4, self.y4, 0.0)
+        self.drawCylinder(self.cylinder11, self.x4, self.y4, -1.0)
 
         self.drawBox(self.box11, -6.0, -6.0, 0.0, 0.0)
 
@@ -162,13 +171,13 @@ class GLWidget(QGLWidget):
 
         glRotated(+90.0, 1.0, 0.0, 0.0)
         # x = x, y = z, z = -y
-        self.drawCylinder(self.cylinder12, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0, -1.0, -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)))
-        self.drawBox(self.box7, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0, -1.0, -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 180.0 - self.gear3angle / math.pi * 180.0)
-        self.drawBox(self.box8, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0, -1.0, -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 180.0 + self.gear3angle / math.pi * 180.0)
-        self.drawCylinder(self.cylinder13, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 - 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)))
-        self.drawCylinder(self.cylinder14, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 + 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)))
-        self.drawBox(self.box9, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 - 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 180.0)
-        self.drawBox(self.box10, -21.0 * math.sin(self.gear2angle) - (6.0 * math.cos(self.gear1angle) - 14.0 * math.sin(self.gear2angle)) - 2.0 - 2.0 * math.cos(self.gear3angle), -1.0 + 2.0 * math.sin(self.gear3angle), -21.0 * math.cos(self.gear2angle) + (6.0 * math.sin(self.gear1angle) + 14.0 * math.cos(self.gear2angle)), 180.0)
+        self.drawCylinder(self.cylinder12, self.x5, -1.0, self.y5)
+        self.drawBox(self.box7, self.x5, -1.0, self.y5, 180.0 - self.gear3angle / math.pi * 180.0)
+        self.drawBox(self.box8, self.x5, -1.0, self.y5, 180.0 + self.gear3angle / math.pi * 180.0)
+        self.drawCylinder(self.cylinder13, self.x6, self.y6, self.y5)
+        self.drawCylinder(self.cylinder14, self.x6, self.y7, self.y5)
+        self.drawBox(self.box9, self.x6, self.y6, self.y5, 180.0)
+        self.drawBox(self.box10, self.x6, self.y7, self.y5, 180.0)
 
 
         glPopMatrix()
@@ -300,12 +309,11 @@ class GLWidget(QGLWidget):
         for i in range(50):
 
                 angle = 2.0 * math.pi * i / 50
-                s1 = r1
 
-                glVertex3d(s1 * math.cos(angle), s1 * math.sin(angle), +z)
-                glVertex3d(s1 * math.cos(angle), s1 * math.sin(angle), -z)
-                glVertex3d(s1 * math.sin(angle), s1 * math.cos(angle), -z)
-                glVertex3d(s1 * math.sin(angle), s1 * math.cos(angle), +z)
+                glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), +z)
+                glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), -z)
+                glVertex3d(r1 * math.sin(angle), r1 * math.cos(angle), -z)
+                glVertex3d(r1 * math.sin(angle), r1 * math.cos(angle), +z)
 
         glVertex3d(r1, 0.0, +z)
         glVertex3d(r1, 0.0, -z)
@@ -429,7 +437,6 @@ class GLWidget(QGLWidget):
         glCallList(gear)
         glPopMatrix()
 
-
     def normalizeAngle(self, angle):
         while (angle < 0):
             angle += 360 * 16
@@ -456,137 +463,6 @@ class GLWidget(QGLWidget):
         self.gear2angle = servo[1] * math.pi / 180.0
         self.gear3angle = servo[2] * math.pi / 180.0
         self.gear4angle = servo[3] * math.pi / 180.0
-
-
-
-
-
-
-class MainWindow(QMainWindow):
-    def __init__(self):        
-        super(MainWindow, self).__init__()
-
-        centralWidget = QWidget()
-        self.setCentralWidget(centralWidget)
-
-        self.glWidget = GLWidget()
-        self.pixmapLabel = QLabel()
-
-        self.glWidgetArea = QScrollArea()
-        self.glWidgetArea.setWidget(self.glWidget)
-        self.glWidgetArea.setWidgetResizable(True)
-        self.glWidgetArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.glWidgetArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.glWidgetArea.setSizePolicy(QSizePolicy.Ignored,
-                QSizePolicy.Ignored)
-        self.glWidgetArea.setMinimumSize(50, 50)
-
-        self.pixmapLabelArea = QScrollArea()
-        self.pixmapLabelArea.setWidget(self.pixmapLabel)
-        self.pixmapLabelArea.setSizePolicy(QSizePolicy.Ignored,
-                QSizePolicy.Ignored)
-        self.pixmapLabelArea.setMinimumSize(50, 50)
-
-        self.createActions()
-        self.createMenus()
-
-        centralLayout = QGridLayout()
-        centralLayout.addWidget(self.glWidgetArea, 0, 0)
-        centralLayout.addWidget(self.pixmapLabelArea, 0, 1)
-        centralWidget.setLayout(centralLayout)
-
-        self.setWindowTitle("Car")
-        self.resize(800, 600)
-
-    def renderIntoPixmap(self):
-        size = self.getSize()
-
-        if size.isValid():
-            pixmap = self.glWidget.renderPixmap(size.width(), size.height())
-            self.setPixmap(pixmap)
-
-    def grabFrameBuffer(self):
-        image = self.glWidget.grabFrameBuffer()
-        self.setPixmap(QPixmap.fromImage(image))
-
-    def clearPixmap(self):
-        self.setPixmap(QPixmap())
-
-    def about(self):
-        QMessageBox.about(self, "About Grabber",
-                "The <b>Grabber</b> example demonstrates two approaches for "
-                "rendering OpenGL into a Qt pixmap.")
-
-    def createActions(self):
-        self.renderIntoPixmapAct = QAction("&Render into Pixmap...",
-                self, shortcut="Ctrl+R", triggered=self.renderIntoPixmap)
-
-        self.grabFrameBufferAct = QAction("&Grab Frame Buffer", self,
-                shortcut="Ctrl+G", triggered=self.grabFrameBuffer)
-
-        self.clearPixmapAct = QAction("&Clear Pixmap", self,
-                shortcut="Ctrl+L", triggered=self.clearPixmap)
-
-        self.exitAct = QAction("E&xit", self, shortcut="Ctrl+Q",
-                triggered=self.close)
-
-        self.aboutAct = QAction("&About", self, triggered=self.about)
-
-        self.aboutQtAct = QAction("About &Qt", self,
-                triggered=QApplication.instance().aboutQt)
-
-    def createMenus(self):
-        self.fileMenu = self.menuBar().addMenu("&File")
-        self.fileMenu.addAction(self.renderIntoPixmapAct)
-        self.fileMenu.addAction(self.grabFrameBufferAct)
-        self.fileMenu.addAction(self.clearPixmapAct)
-        self.fileMenu.addSeparator()
-        self.fileMenu.addAction(self.exitAct)
-
-        self.helpMenu = self.menuBar().addMenu("&Help")
-        self.helpMenu.addAction(self.aboutAct)
-        self.helpMenu.addAction(self.aboutQtAct)
-
-    def createSlider(self, changedSignal, setterSlot):
-        slider = QSlider(Qt.Horizontal)
-        slider.setRange(0, 360 * 16)
-        slider.setSingleStep(16)
-        slider.setPageStep(15 * 16)
-        slider.setTickInterval(15 * 16)
-        slider.setTickPosition(QSlider.TicksRight)
-
-        slider.valueChanged.connect(setterSlot)
-        changedSignal.connect(slider.setValue)
-
-        return slider
-
-    def setPixmap(self, pixmap):
-        self.pixmapLabel.setPixmap(pixmap)
-        size = pixmap.size()
-
-        if size - QSize(1, 0) == self.pixmapLabelArea.maximumViewportSize():
-            size -= QSize(1, 0)
-
-        self.pixmapLabel.resize(size)
-
-    def getSize(self):
-        text, ok = QInputDialog.getText(self, "Grabber",
-                "Enter pixmap size:", QLineEdit.Normal,
-                "%d x %d" % (self.glWidget.width(), self.glWidget.height()))
-
-        if not ok:
-            return QSize()
-
-        regExp = QRegExp("([0-9]+) *x *([0-9]+)")
-
-        if regExp.exactMatch(text):
-            width = regExp.cap(0).toInt()
-            height = regExp.cap(1).toInt()
-            if width > 0 and width < 2048 and height > 0 and height < 2048:
-                return QSize(width, height)
-
-        return self.glWidget.size()
-
 
 if __name__ == '__main__':
 
