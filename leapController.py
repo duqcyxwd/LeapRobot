@@ -15,17 +15,27 @@ class leapListener(Leap.Listener):
 	def on_frame(self, controller):
 		frame = controller.frame()
 		msg = ''
+		li = []
 
 		for hand in frame.hands:
 			if hand.is_left:
 				handDir =  hand.direction.to_float_array()
-				msg += ",left,%i, %i, %i" % (int(handDir[0] * 100), int(handDir[1] * 100), int(handDir[2] * 100))
+				handDir[0] = int(handDir[0] * 100)
+				handDir[1] = int(handDir[1] * 100)
+				handDir[2] = int(handDir[2] * 100)
+				msg += " left: (%i, %i, %i)" % (handDir[0], handDir[1], handDir[2])
+				li.append(['l', handDir])
 			else:
-				strength = hand.grab_strength
+				strength = int(hand.grab_strength * 10)
 				handPos = hand.palm_position.to_float_array()
-				msg += ",right,%i, %i, %i, %i" % (int(handPos[0] / 10), int(handPos[1] / 10), int(handPos[2] / 10), strength*10)
+				handPos[0] = int(handPos[0] * 10)
+				handPos[1] = int(handPos[1] * 10)
+				handPos[2] = int(handPos[2] * 10)
+				msg += " right: (%i, %i, %i) grab_strength: %i" % (handPos[0], handPos[1], handPos[2], strength)
+				li.append(['r', handPos, strength])
+
 			self.activity[0] = msg
-			self.activity[1] = []
+			self.activity[1] = li
 
 class LeapController(QtCore.QThread):
 	"""docstring for LeapController"""
@@ -57,7 +67,6 @@ class LeapController(QtCore.QThread):
 			# print "this message: " + self.message[0]
 
 			if self.message[0] != self.oldmessage:
-				print "new incoming message"
 				self.oldmessage = self.message[0]
 				self.leapUpdateSignal.emit(self.message[0])
 				self.leapUpdateSignalInlist.emit(self.message[1])

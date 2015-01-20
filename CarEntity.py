@@ -12,8 +12,28 @@ class CarEntity(QtCore.QObject):
 		self.direction = INITDIR
 		self.servoAngle = [INISERVOANGLE1, INISERVOANGLE2, INISERVOANGLE3, INISERVOANGLE4]
 
-	def updateFromLeap(self, str):
-		self.str = str
+	def updateFromLeap(self, li):
+		# self.str = li
+		
+		print li
+		for x in li:
+			if x[0] == 'l':
+				self.setSpeedByCalculate(x[1][1])
+				self.setdirectionByCalculate(x[1][0])
+				direct = x[1][0]
+				if direct > 0:
+					self.direction = 2
+				else:
+					self.direction = 0
+
+			elif x[0] == 'r':
+				# self.servoAngle = x[1].append(x[2])
+				# self.direction = self.servoAngle
+				self.setAngle(x[1], x[2])
+				pass
+
+
+		self.update()
 
 
 	def updateData(self, data):
@@ -31,6 +51,10 @@ class CarEntity(QtCore.QObject):
 
 	def getSpeed(self):
 		return self.speed
+
+	def setSpeedByCalculate(self, spd):
+		self.speed = spd * -1
+		self.update()
 
 	def setSpeed(self, speed):
 		self.speed = speed
@@ -57,6 +81,12 @@ class CarEntity(QtCore.QObject):
 		self.direction = direction
 		self.update()
 
+	def setdirectionByCalculate(self, direction):
+		if direction > 0:
+			self.direction = 2
+		else:
+			self.direction = 0
+
 	def goLeft(self):
 		if self.direction != 0:
 			self.direction -= 1
@@ -73,6 +103,12 @@ class CarEntity(QtCore.QObject):
 
 	def setAngle(self, servoAngle):
 		self.servoAngle = servoAngle
+		self.update()	
+
+	def setAngle(self, position, grab_strength):
+		angle = position
+		angle.append(grab_strength)
+		self.servoAngle = angle
 		self.update()
 
 	def servo1up(self):

@@ -82,7 +82,7 @@ class MainWindow(QMainWindow):
 
 	@QtCore.pyqtSlot(str, name='')
 	def updateLeapControllerLabel(self, str):
-		print "update string: %s" % str
+		# print "update string: %s" % str
 		self.leapInfo.setText(str)
 		pass
 
