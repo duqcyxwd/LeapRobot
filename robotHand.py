@@ -52,6 +52,9 @@ class GLWidget(QGLWidget):
         timer.timeout.connect(self.advanceGears)
         timer.start(20)
 
+    def setCarEntity(self, carEntity):
+        self.carEntity = carEntity
+
     def setXRotation(self, angle):
         self.normalizeAngle(angle)
 
@@ -693,6 +696,6 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-    mainWin = MainWindow()
+    mainWin = GLWidget()
     mainWin.show()
     sys.exit(app.exec_())    

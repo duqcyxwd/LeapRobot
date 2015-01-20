@@ -17,18 +17,28 @@ class ControlPage(base_class, form_class):
 		super(ControlPage, self).__init__(*args)
 		self.setupUi(self)
 
-		handWidget = GLWidget()
-		self.robothandLayout.addWidget(handWidget)
+
 
 		carEntity = CarEntity()
-		self.setCarEntity(carEntity, handWidget)
-	
-	def setCarEntity(self, carEntity, handWidget):
-		self.carEntity = carEntity
+		self.setCarEntity(carEntity)
+
+
+		handWidget = GLWidget()
 		self.handWidget = handWidget
 
-		self.carEntity.updateSignal.connect(self.updateCarInterface)
+		self.handWidget.setCarEntity(carEntity)
+
+
+		self.robothandLayout.addWidget(handWidget)
+
 		self.carEntity.updateSignal.connect(self.handWidget.updateGraph)
+
+
+	def setCarEntity(self, carEntity):
+		self.carEntity = carEntity
+
+
+		self.carEntity.updateSignal.connect(self.updateCarInterface)
 
 		self.inc.pressed.connect(self.carEntity.increaseSpeed)
 		self.dec.pressed.connect(self.carEntity.decreaseSpeed)
