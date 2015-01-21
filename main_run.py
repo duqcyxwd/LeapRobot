@@ -98,17 +98,4 @@ def main():
 
 
 if __name__ == '__main__':
-
-	tt = True
-	if tt:
-		leapArm = LeapArm()
-
-		import time
-		time.sleep(1)
-		# leapArm.startLeapController()
-		# leapArm.startLeapController()
-		leapArm.mw.on_newtab_pressed()
-		leapArm.run()
-		pass
-	else:
-		main()	
+	main()	
