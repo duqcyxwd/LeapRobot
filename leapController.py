@@ -28,9 +28,9 @@ class leapListener(Leap.Listener):
 			else:
 				strength = int(hand.grab_strength * 10)
 				handPos = hand.palm_position.to_float_array()
-				handPos[0] = int(handPos[0] * 10)
-				handPos[1] = int(handPos[1] * 10)
-				handPos[2] = int(handPos[2] * 10)
+				handPos[0] = int(handPos[0] * 1)
+				handPos[1] = int(handPos[1] * 1)
+				handPos[2] = int(handPos[2] * 1)
 				msg += " right: (%i, %i, %i) grab_strength: %i" % (handPos[0], handPos[1], handPos[2], strength)
 				li.append(['r', handPos, strength])
 

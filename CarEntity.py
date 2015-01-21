@@ -20,7 +20,6 @@ class CarEntity(QtCore.QObject):
 	def updateFromLeap(self, li):
 		# self.str = li
 		
-		print li
 		for x in li:
 			if x[0] == 'l':
 				self.setSpeedByCalculate(x[1][1])
