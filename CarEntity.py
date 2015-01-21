@@ -15,6 +15,7 @@ class CarEntity(QtCore.QObject):
 		self.setDirection(INITDIR)
 		self.setAngle([INISERVOANGLE1, INISERVOANGLE2, INISERVOANGLE3, INISERVOANGLE4])
 
+		self.dataChangeRateByButton = GRAPH_BUTTON_CHANGE_RATE
 		self.isReady = True
 
 	def updateFromLeap(self, li):
@@ -146,42 +147,42 @@ class CarEntity(QtCore.QObject):
 
 	def servo1up(self):
 		angl = self.servoAngle
-		self.servoAngle[0] += 6
+		self.servoAngle[0] += self.dataChangeRateByButton
 		self.update()
 
 	def servo1down(self):
 		angl = self.servoAngle
-		self.servoAngle[0] -= 6
+		self.servoAngle[0] -= self.dataChangeRateByButton
 		self.update()
 
 	def servo2up(self):
 		angl = self.servoAngle
-		self.servoAngle[1] += 6
+		self.servoAngle[1] += self.dataChangeRateByButton
 		self.update()
 
 	def servo2down(self):
 		angl = self.servoAngle
-		self.servoAngle[1] -= 6
+		self.servoAngle[1] -= self.dataChangeRateByButton
 		self.update()
 
 	def servo3up(self):
 		angl = self.servoAngle
-		self.servoAngle[2] += 6
+		self.servoAngle[2] += self.dataChangeRateByButton
 		self.update()
 
 	def servo3down(self):
 		angl = self.servoAngle
-		self.servoAngle[2] -= 6
+		self.servoAngle[2] -= self.dataChangeRateByButton
 		self.update()
 
 	def servo4up(self):
 		angl = self.servoAngle
-		self.servoAngle[3] += 6
+		self.servoAngle[3] += self.dataChangeRateByButton
 		self.update()
 
 	def servo4down(self):
 		angl = self.servoAngle
-		self.servoAngle[3] -= 6
+		self.servoAngle[3] -= self.dataChangeRateByButton
 		self.update()
 
 
