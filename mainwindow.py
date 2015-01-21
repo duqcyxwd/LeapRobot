@@ -9,6 +9,10 @@ from controlPage import ControlPage
 class MainWindow(QMainWindow):
 	startLeapSignal = QtCore.pyqtSignal()
 	stopLeapSignal = QtCore.pyqtSignal()
+
+	startConnectionSignal = QtCore.pyqtSignal()
+	stopConnectionSignal = QtCore.pyqtSignal()
+
 	testSignal = QtCore.pyqtSignal([list])
 
 	def __init__(self, *args):
@@ -67,8 +71,11 @@ class MainWindow(QMainWindow):
 		pass
 
 	def on_stopConnection_pressed(self):
-		print "stop button pressed"
 		self._controller.stopConnection()
+
+
+	def on_startConnection_pressed(self):
+		self._controller.startConnection()
 
 
 	def on_testConnection_pressed(self):
