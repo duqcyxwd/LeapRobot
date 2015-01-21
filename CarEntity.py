@@ -2,30 +2,69 @@ from Model.Constent import *
 from PyQt5 import QtCore
 
 class CarEntity(QtCore.QObject):
- 	"""docstring for CarEntity"""
+	"""docstring for CarEntity"""
 
-	updateSignal = QtCore.pyqtSignal()
+	updateSignal = QtCore.pyqtSignal([list])
+
 	def __init__(self):
 		super(CarEntity, self).__init__()
-		self.speed = INITSPEED
-		self.direction = INITDIR
-		self.servoAngle = [INISERVOANGLE1, INISERVOANGLE2, INISERVOANGLE3, INISERVOANGLE4]
+
+		self.isReady = False
+
+		self.setSpeed(INITSPEED)
+		self.setDirection(INITDIR)
+		self.setAngle([INISERVOANGLE1, INISERVOANGLE2, INISERVOANGLE3, INISERVOANGLE4])
+
+		self.isReady = True
+
+	def updateFromLeap(self, li):
+		# self.str = li
+		
+		print li
+		for x in li:
+			if x[0] == 'l':
+				self.setSpeedByCalculate(x[1][1])
+				self.setdirectionByCalculate(x[1][0])
+				direct = x[1][0]
+				if direct > 0:
+					self.direction = 2
+				else:
+					self.direction = 0
+
+			elif x[0] == 'r':
+				# self.servoAngle = x[1].append(x[2])
+				# self.direction = self.servoAngle
+				
+				angle = x[1]
+				angle.append(x[2])
+				self.setAngle(angle)
+				pass
+
+
+		self.update()
+
 
 	def updateData(self, data):
 		#if data changed
 		#emit signal
-		print 'updateData called'
-		print data
+		# print 'updateData called'
+		# print data
 		self.speed = data[0]
 		self.direction = data[1]
 		self.servoAngle = data[2]
 		self.update()
 
 	def update(self):
-		self.updateSignal.emit()
+		if self.isReady:
+			updateMsg = [self.speed, self.direction, self.servoAngle[0], self.servoAngle[1], self.servoAngle[2], self.servoAngle[3]]
+			self.updateSignal.emit(updateMsg)
 
 	def getSpeed(self):
 		return self.speed
+
+	def setSpeedByCalculate(self, spd):
+		self.speed = spd * -1
+		self.update()
 
 	def setSpeed(self, speed):
 		self.speed = speed
@@ -49,8 +88,19 @@ class CarEntity(QtCore.QObject):
 		return self.direction
 
 	def setDirection(self, direction):
-		self.direction = direction
+		if direction > 2:
+			self.direction = 2
+		elif direction < 0:
+			self.direction = 0
+		else:
+			self.direction = 1
 		self.update()
+
+	def setdirectionByCalculate(self, direction):
+		if direction > 0:
+			self.direction = 2
+		else:
+			self.direction = 0
 
 	def goLeft(self):
 		if self.direction != 0:
@@ -67,8 +117,31 @@ class CarEntity(QtCore.QObject):
 		return self.servoAngle
 
 	def setAngle(self, servoAngle):
+		# hard code here
+		
+		if servoAngle[0] > 255:
+			servoAngle[0] = 255
+		elif servoAngle[0] < 0:
+			servoAngle[0] =0
+
+		if servoAngle[1] > 255:
+			servoAngle[1] = 255
+		elif servoAngle[1] < 0:
+			servoAngle[1] =0
+
+		if servoAngle[2] > 255:
+			servoAngle[2] = 255
+		elif servoAngle[2] < 0:
+			servoAngle[2] =0
+
+		if servoAngle[3] > 255:
+			servoAngle[3] = 255
+		elif servoAngle[3] < 0:
+			servoAngle[3] =0
+
 		self.servoAngle = servoAngle
-		self.update()
+		self.update()	
+
 
 	def servo1up(self):
 		angl = self.servoAngle

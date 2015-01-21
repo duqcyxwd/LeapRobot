@@ -35,8 +35,7 @@ class ControlPage(base_class, form_class):
 
 
 	def setCarEntity(self, carEntity):
-		self.carEntity = carEntity
-
+		self.carEntity = carEntity;
 		self.carEntity.updateSignal.connect(self.updateCarInterface)
 
 		self.inc.pressed.connect(self.carEntity.increaseSpeed)
@@ -65,8 +64,10 @@ class ControlPage(base_class, form_class):
 	# 	self.updateSignal.emit([50, 1, [2, 3, 4, 5]])
 
 	@pyqtSlot()
-	def updateCarInterface(self):
+	def updateCarInterface(self, dataList = []):
+
 		self.speedLabel.setText(str(self.carEntity.getSpeed()))
+
 
 		dirc = self.carEntity.getDirection()
 		if dirc == 0:
@@ -81,7 +82,10 @@ class ControlPage(base_class, form_class):
 		self.servo0.setText(str(servo[0]))
 		self.servo1.setText(str(servo[1]))
 		self.servo2.setText(str(servo[2]))
-		self.servo3.setText(str(servo[3]))
+		self.servo3.setText(str(servo[3]))	
+		
+
+
 
 	@pyqtSlot()
 	def testFunction(self):
@@ -130,4 +134,8 @@ if __name__ == '__main__':
 	controllPage = ControlPage()
 	controllPage.show()
 
+	from CarEntity import CarEntity
+	from time import sleep
+
+			
 	sys.exit(app.exec_())

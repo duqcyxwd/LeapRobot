@@ -4,6 +4,8 @@ from PyQt5 import QtCore
 
 from leapController import LeapController
 from mainwindow import MainWindow
+
+from Wifi.CommandIf import CommandIf
 from CarEntity import CarEntity
 
 class LeapArm(QtCore.QObject):
@@ -19,16 +21,16 @@ class LeapArm(QtCore.QObject):
 		self.mw.setController(self)
 
 		self.carEntity = CarEntity()
+		self.mw.setCarEntity(self.carEntity)
 
-		self.startConnection()
-		self.initSockets()
-		
 
 		# self.connect(self.mw, QtCore.SIGNAL("startLeapSignal"), self, QtCore.SLOT("startLeapController()"))
 		# self.mw.startLeapSignal.connect(self, QtCore.SLOT("startLeapController()"))
 		self.mw.startLeapSignal.connect(self.startLeapController)
 		self.mw.stopLeapSignal.connect(self.stopLeapControl)
 
+		self.mw.startConnectionSignal.connect(self.startConnection)
+		self.mw.stopConnectionSignal.connect(self.stopConnection)
 
 
 		# startLeapSingnal
@@ -41,18 +43,22 @@ class LeapArm(QtCore.QObject):
 
 	@QtCore.pyqtSlot()
 	def startConnection(self):
-		# start connection here
-		# 
 		# if connected, or connection down, restart connection. 
-		# 
 		# Todo: Add icon to display connection states. 
 		self.mw.addLog("start new Connection")
+  		
+  		self.command_if_thread = CommandIf('', 55555)
+
+		self.carEntity.updateSignal.connect(self.command_if_thread.update)
 		
+  		self.command_if_thread.start()
 		pass
 
 	def stopConnection(self):
 		print "stopConnection"
 		self.mw.addLog("Stop Connection")
+  		self.command_if_thread.start().terminate()
+
 		pass
 
 
@@ -60,7 +66,8 @@ class LeapArm(QtCore.QObject):
 		self.mw.addLog("start leap controller")
 		
 		self.leapControlThread = LeapController()
-		self.leapControlThread.stringSignal.connect(self.mw.updateLeapControllerLabel)
+		self.leapControlThread.leapUpdateSignalInlist.connect(self.carEntity.updateFromLeap)
+		self.leapControlThread.leapUpdateSignal.connect(self.mw.updateLeapControllerLabel)
 
 		# terminate application when leap controller killed
 		# self.leapControlThread.finished.connect(self.app.exit)
@@ -72,7 +79,6 @@ class LeapArm(QtCore.QObject):
 	def stopLeapControl(self):
 		print "stopConnection"
 		self.mw.addLog("stop Leap Control")
-
 		self.leapControlThread.stopListen()
 
 		# TODO: Terminate will crash program, check the reason
@@ -87,8 +93,22 @@ class LeapArm(QtCore.QObject):
 # startLeapSingnal
 # run
 def main():
-	mainwindow = LeapArm()
-	mainwindow.run()
+	leapArm = LeapArm()
+	leapArm.run()
+
 
 if __name__ == '__main__':
-	main()	
+
+	tt = True
+	if tt:
+		leapArm = LeapArm()
+
+		import time
+		time.sleep(1)
+		# leapArm.startLeapController()
+		# leapArm.startLeapController()
+		leapArm.mw.on_newtab_pressed()
+		leapArm.run()
+		pass
+	else:
+		main()	
