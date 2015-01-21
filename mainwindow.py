@@ -9,7 +9,11 @@ from controlPage import ControlPage
 class MainWindow(QMainWindow):
 	startLeapSignal = QtCore.pyqtSignal()
 	stopLeapSignal = QtCore.pyqtSignal()
-	testSignal = QtCore.pyqtSignal(['QString'])
+
+	startConnectionSignal = QtCore.pyqtSignal()
+	stopConnectionSignal = QtCore.pyqtSignal()
+
+	testSignal = QtCore.pyqtSignal([list])
 
 	def __init__(self, *args):
 		super(MainWindow, self).__init__(*args)
@@ -67,19 +71,25 @@ class MainWindow(QMainWindow):
 		pass
 
 	def on_stopConnection_pressed(self):
-		print "stop button pressed"
 		self._controller.stopConnection()
+
+
+	def on_startConnection_pressed(self):
+		self._controller.startConnection()
 
 
 	def on_testConnection_pressed(self):
 		print "testConnection"
-		self.testSignal.connect(self.updateLeapControllerLabel)
-		self.testSignal.emit("hihissshi")
+		self.testSignal.connect(self.testSignalFunction)
+		self.testSignal.emit(['c', 'd', 1, 2, 3, [1, 2, 3]])
 		
+	@QtCore.pyqtSlot(list)
+	def testSignalFunction(self, list):
+		print list
 
 	@QtCore.pyqtSlot(str, name='')
 	def updateLeapControllerLabel(self, str):
-		print "update string: %s" % str
+		# print "update string: %s" % str
 		self.leapInfo.setText(str)
 		pass
 
@@ -91,8 +101,8 @@ if __name__ == '__main__':
 
 	import time
 	widget.updateLeapControllerLabel("hi")
-	time.sleep(3)
-	widget.updateLeapControllerLabel("hi2")
+	# time.sleep(3)
+	# widget.updateLeapControllerLabel("hi2")
 	i = 0
 
 	sys.exit(app.exec_())

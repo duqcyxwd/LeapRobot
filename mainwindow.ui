@@ -108,21 +108,28 @@
       <item>
        <widget class="QPushButton" name="startLeapController">
         <property name="text">
-         <string>startLeapControl</string>
+         <string>start leap control</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="stopLeapController">
         <property name="text">
-         <string>stopLeapControl</string>
+         <string>stop Leap control</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="startConnection">
+        <property name="text">
+         <string>Start connection</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="stopConnection">
         <property name="text">
-         <string>stopConnection</string>
+         <string>Stop connection</string>
         </property>
        </widget>
       </item>
