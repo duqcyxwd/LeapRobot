@@ -19,19 +19,11 @@ class ControlPage(base_class, form_class):
 
 
 
-		carEntity = CarEntity()
-		self.setCarEntity(carEntity)
+		# carEntity = CarEntity()
+		# self.setCarEntity(carEntity)
 
 
-		handWidget = GLWidget()
-		self.handWidget = handWidget
 
-		self.handWidget.setCarEntity(carEntity)
-
-
-		self.robothandLayout.addWidget(handWidget)
-
-		self.carEntity.updateSignal.connect(self.handWidget.updateGraph)
 
 
 	def setCarEntity(self, carEntity):
@@ -58,6 +50,15 @@ class ControlPage(base_class, form_class):
 		# self.updateSignal.connect(self.carEntity.updateData)
 
 		self.updateCarInterface()
+
+		handWidget = GLWidget()
+		self.handWidget = handWidget
+
+		self.handWidget.setCarEntity(self.carEntity)
+
+
+		self.robothandLayout.addWidget(handWidget)
+		self.carEntity.updateSignal.connect(self.handWidget.updateGraph)
 
 
 	# def updateModel(self):

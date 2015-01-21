@@ -25,10 +25,13 @@ class CarEntity(QtCore.QObject):
 				self.setSpeedByCalculate(x[1][1])
 				self.setdirectionByCalculate(x[1][0])
 				direct = x[1][0]
-				if direct > 0:
+				print direct
+				if direct > 20:
 					self.direction = 2
-				else:
+				elif direct < -20:
 					self.direction = 0
+				else:
+					self.direction = 1
 
 			elif x[0] == 'r':
 				# self.servoAngle = x[1].append(x[2])
