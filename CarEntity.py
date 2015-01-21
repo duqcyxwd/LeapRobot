@@ -25,7 +25,6 @@ class CarEntity(QtCore.QObject):
 				self.setSpeedByCalculate(x[1][1])
 				self.setdirectionByCalculate(x[1][0])
 				direct = x[1][0]
-				print direct
 				if direct > 20:
 					self.direction = 2
 				elif direct < -20:
@@ -147,42 +146,42 @@ class CarEntity(QtCore.QObject):
 
 	def servo1up(self):
 		angl = self.servoAngle
-		self.servoAngle[0] += 3
+		self.servoAngle[0] += 6
 		self.update()
 
 	def servo1down(self):
 		angl = self.servoAngle
-		self.servoAngle[0] -= 3
+		self.servoAngle[0] -= 6
 		self.update()
 
 	def servo2up(self):
 		angl = self.servoAngle
-		self.servoAngle[1] += 3
+		self.servoAngle[1] += 6
 		self.update()
 
 	def servo2down(self):
 		angl = self.servoAngle
-		self.servoAngle[1] -= 3
+		self.servoAngle[1] -= 6
 		self.update()
 
 	def servo3up(self):
 		angl = self.servoAngle
-		self.servoAngle[2] += 3
+		self.servoAngle[2] += 6
 		self.update()
 
 	def servo3down(self):
 		angl = self.servoAngle
-		self.servoAngle[2] -= 3
+		self.servoAngle[2] -= 6
 		self.update()
 
 	def servo4up(self):
 		angl = self.servoAngle
-		self.servoAngle[3] += 3
+		self.servoAngle[3] += 6
 		self.update()
 
 	def servo4down(self):
 		angl = self.servoAngle
-		self.servoAngle[3] -= 3
+		self.servoAngle[3] -= 6
 		self.update()
 
 

@@ -1,6 +1,8 @@
 import sys
 import math
+import numpy as np
 
+from Model.CommonFunction import *
 from Model.Constent import *
 from PyQt5.QtCore import pyqtSignal, QRegExp, QSize, Qt, QTimer
 from PyQt5.QtGui import QPixmap
@@ -36,12 +38,38 @@ class GLWidget(QGLWidget):
         self.gear3angle = INISERVOANGLE3 * math.pi / 180.0     # plier
         self.gear4angle = INISERVOANGLE4 * math.pi / 180.0     # head
 
+
+        self.gear1angle2 = self.gear1angle
+        self.gear2angle2 = self.gear2angle
+        self.gear3angle2 = self.gear3angle
+        self.gear4angle2 = self.gear4angle
+
+
         self.gear1Rot = 0.0 # tier
         self.tire1angle = (INITDIR - 1) * math.pi / 4.0
 
+        self.isUpdate = False
+
+
+        # Update graph per 20ms
         timer = QTimer(self)
         timer.timeout.connect(self.advanceGears)
+        timer.timeout.connect(self.smoothMove)
+        timer.timeout.connect(self.updateGL)
         timer.start(20)
+
+        # Update target position per 100ms
+        timer2 = QTimer(self)
+        timer2.timeout.connect(self.updateGraph2)
+        timer2.start(100)
+
+        self.moveSpeed = 0.01
+
+
+        # timer3 = QTimer(self)
+        # timer3.timeout.connect(self.testing)
+        # timer3.start(3000)
+
 
     def setCarEntity(self, carEntity):
         self.carEntity = carEntity
@@ -205,8 +233,6 @@ class GLWidget(QGLWidget):
     def advanceGears(self):
 
         self.gear1Rot += self.speed * 2
-
-        self.updateGL()    
 
     def xRotation(self):
         return self.xRot
@@ -440,25 +466,49 @@ class GLWidget(QGLWidget):
         while (angle > 360):
             angle -= 360
 
+
     def updateGraph(self):
-        self.speed = self.carEntity.getSpeed()
+        self.isUpdate = True
 
-        dirc = self.carEntity.getDirection()
-        if dirc == 0:
-            self.tire1angle = 45.0 * math.pi / 180.0
-            # dirstr = 'left'
-        elif dirc == 1:
-            self.tire1angle = 0.0
-            # dirstr = 'straight'
-        elif dirc == 2:
-            self.tire1angle = -45.0 * math.pi / 180.0
-            # dirstr = 'right'
 
-        servo = self.carEntity.getServoAngle()
-        self.gear1angle = servo[0] * math.pi / 180.0
-        self.gear2angle = servo[1] * math.pi / 180.0
-        self.gear3angle = servo[2] * math.pi / 180.0
-        self.gear4angle = servo[3] * math.pi / 180.0
+
+    def updateGraph2(self):
+        if self.isUpdate:
+            self.isUpdate = False
+            self.speed = self.carEntity.getSpeed()
+
+            dirc = self.carEntity.getDirection()
+            if dirc == 0:
+                self.tire1angle = 45.0 * math.pi / 180.0
+                # dirstr = 'left'
+            elif dirc == 1:
+                self.tire1angle = 0.0
+                # dirstr = 'straight'
+            elif dirc == 2:
+                self.tire1angle = -45.0 * math.pi / 180.0
+                # dirstr = 'right'
+
+            servo = self.carEntity.getServoAngle()
+
+            self.gear1angle2 = servo[0] * math.pi / 180.0
+            self.gear2angle2 = servo[1] * math.pi / 180.0
+            self.gear3angle2 = servo[2] * math.pi / 180.0
+            self.gear4angle2 = servo[3] * math.pi / 180.0
+
+
+    # def testing(self):
+    #     self.gear1angle2 = INISERVOANGLE1 * math.pi / 180.0 * 2     # red body
+    #     self.gear2angle2 = INISERVOANGLE2 * math.pi / 180.0 * 2     # green body
+    #     self.gear3angle2 = INISERVOANGLE3 * math.pi / 180.0 * 2     # plier
+    #     self.gear4angle2 = INISERVOANGLE4 * math.pi / 180.0 * 2     # head
+
+
+    def smoothMove(self):
+        self.gear1angle = approach(self.gear1angle, self.gear1angle2, self.moveSpeed)
+        self.gear2angle = approach(self.gear2angle, self.gear2angle2, self.moveSpeed)
+        self.gear3angle = approach(self.gear3angle, self.gear3angle2, self.moveSpeed)
+        self.gear4angle = approach(self.gear4angle, self.gear4angle2, self.moveSpeed)
+
 
 if __name__ == '__main__':
 
