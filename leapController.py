@@ -11,6 +11,7 @@ from PyQt5 import QtCore
 class leapListener(Leap.Listener):
 	right_hand_init_point = np.array(RIGHTHAND_INITPOINT)
 	oldPosition = np.array(RIGHTHAND_INITPOINT)
+	rightHandResetCheck = [0, 0]
 
 	def on_connect(self, controller):
 		print "Connected"
@@ -23,6 +24,7 @@ class leapListener(Leap.Listener):
 
 		for hand in frame.hands:
 			if hand.is_left:
+
 				if hand.grab_strength < LEFT_GRABLIMIT:
 					handDir =  hand.direction.to_float_array()
 					handDir[0] = int(handDir[0] * 100)
@@ -40,12 +42,30 @@ class leapListener(Leap.Listener):
 					self.right_hand_init_point = (handPos + RIGHTHAND_SHIFT) * RIGHTHAND_SCALE - self.oldPosition
 
 				else:
+
+					normal = hand.palm_normal
+					direction = hand.direction
+					# Calculate roll degree
+					row = normal.roll * Leap.RAD_TO_DEG
+
+					if row > 40:
+						self.rightHandResetCheck[1] = 1
+					elif row < -30:
+						self.rightHandResetCheck[0] = 1
+					
 					strength = int(hand.grab_strength * 10)
 					handNewPos = np.array(hand.palm_position.to_float_array()).astype(int) * RIGHTHAND_SCALE
 
 					handOldPosition = handNewPos - self.right_hand_init_point
 
 					self.oldPosition = handOldPosition
+
+					#  -30 to 70 degree to reset init position
+					if self.rightHandResetCheck == [1, 1]:
+						print "reset right hand position"
+						self.rightHandResetCheck = [0, 0]
+						self.right_hand_init_point = handNewPos
+
 
 					msg += " right: (%i, %i, %i) grab_strength: %i" % (handOldPosition[0], handOldPosition[1], handOldPosition[2], strength)
 					li.append(['r', handOldPosition, strength])
