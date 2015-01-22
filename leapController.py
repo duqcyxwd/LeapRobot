@@ -64,7 +64,7 @@ class leapListener(Leap.Listener):
 					if self.rightHandResetCheck == [1, 1]:
 						print "reset right hand position"
 						self.rightHandResetCheck = [0, 0]
-						self.right_hand_init_point = handNewPos
+						self.right_hand_init_point = handNewPos + RIGHTHAND_SHIFT
 
 
 					msg += " right: (%i, %i, %i) grab_strength: %i" % (handOldPosition[0], handOldPosition[1], handOldPosition[2], strength)
