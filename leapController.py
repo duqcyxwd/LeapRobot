@@ -33,14 +33,14 @@ class leapListener(Leap.Listener):
 				# If grab_strength > LEFT_GRABLIMIT, you can move, but celebrate
 				if hand.grab_strength > LEFT_GRABLIMIT:
 
-					handPos = hand.palm_position.to_float_array()
-					self.right_hand_init_point = np.array(handPos).astype(int)
+					handPos = np.array(hand.palm_position.to_float_array()).astype(int)
+					self.right_hand_init_point = handPos * RIGHTHAND_SCALE
 
 				else:
 					strength = int(hand.grab_strength * 10)
-					handNewPos = hand.palm_position.to_float_array()
+					handNewPos = np.array(hand.palm_position.to_float_array()).astype(int) * RIGHTHAND_SCALE
 
-					handPos = np.array(handNewPos).astype(int) - self.right_hand_init_point
+					handPos = handNewPos - self.right_hand_init_point
 					msg += " right: (%i, %i, %i) grab_strength: %i" % (handPos[0], handPos[1], handPos[2], strength)
 					li.append(['r', handPos, strength])
 

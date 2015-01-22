@@ -2,6 +2,8 @@ from Model.Constent import *
 from PyQt5 import QtCore
 import numpy as np
 
+from Model.CommonFunction import calculateFromXYZToDegree
+
 
 class CarEntity(QtCore.QObject):
 	"""docstring for CarEntity"""
@@ -41,8 +43,18 @@ class CarEntity(QtCore.QObject):
 				# self.servoAngle = x[1].append(x[2])
 				# self.direction = self.servoAngle
 				
-				angle = np.append(x[1], x[2])
+
+				angle = x[1] 
+
+				print x[1]
+
+				angle = calculateFromXYZToDegree(angle[0], angle[1], angle[2], 80, 80, 68)
+				
+				angle.append(x[2])
+
 				self.setAngle(angle)
+
+
 			elif x[0] == 'RightCelebrate':
 
 				pass
@@ -126,26 +138,26 @@ class CarEntity(QtCore.QObject):
 
 	def setAngle(self, servoAngle):
 		# hard code here
-		
-		if servoAngle[0] > 255:
-			servoAngle[0] = 255
-		elif servoAngle[0] < 0:
-			servoAngle[0] =0
 
-		if servoAngle[1] > 255:
-			servoAngle[1] = 255
-		elif servoAngle[1] < 0:
-			servoAngle[1] =0
+		# if servoAngle[0] > 255:
+		# 	servoAngle[0] = 255
+		# elif servoAngle[0] < 0:
+		# 	servoAngle[0] =0
 
-		if servoAngle[2] > 255:
-			servoAngle[2] = 255
-		elif servoAngle[2] < 0:
-			servoAngle[2] =0
+		# if servoAngle[1] > 255:
+		# 	servoAngle[1] = 255
+		# elif servoAngle[1] < 0:
+		# 	servoAngle[1] =0
 
-		if servoAngle[3] > 255:
-			servoAngle[3] = 255
-		elif servoAngle[3] < 0:
-			servoAngle[3] =0
+		# if servoAngle[2] > 255:
+		# 	servoAngle[2] = 255
+		# elif servoAngle[2] < 0:
+		# 	servoAngle[2] =0
+
+		# if servoAngle[3] > 255:
+		# 	servoAngle[3] = 255
+		# elif servoAngle[3] < 0:
+		# 	servoAngle[3] =0
 
 		self.servoAngle = servoAngle
 		self.update()	

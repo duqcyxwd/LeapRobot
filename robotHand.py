@@ -490,10 +490,10 @@ class GLWidget(QGLWidget):
 
             servo = self.carEntity.getServoAngle()
 
-            self.gear1angle2 = servo[0] * math.pi / 180.0
-            self.gear2angle2 = servo[1] * math.pi / 180.0
-            self.gear3angle2 = servo[2] * math.pi / 180.0
-            self.gear4angle2 = servo[3] * math.pi / 180.0
+            self.gear1angle2 = servo[1] * math.pi / 180.0
+            self.gear2angle2 = servo[2] * math.pi / 180.0
+            self.gear3angle2 = servo[3] * math.pi / 180.0
+            self.gear4angle2 = servo[0] * math.pi / 180.0
 
 
     # def testing(self):
