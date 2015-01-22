@@ -1,5 +1,7 @@
 from Model.Constent import *
 from PyQt5 import QtCore
+import numpy as np
+
 
 class CarEntity(QtCore.QObject):
 	"""docstring for CarEntity"""
@@ -19,8 +21,6 @@ class CarEntity(QtCore.QObject):
 		self.isReady = True
 
 	def updateFromLeap(self, li):
-		# self.str = li
-		
 		for x in li:
 			if x[0] == 'l':
 				self.setSpeedByCalculate(x[1][1])
@@ -33,14 +33,20 @@ class CarEntity(QtCore.QObject):
 				else:
 					self.direction = 1
 
+			elif x[0] == 'NoHand':
+				self.setSpeed(0)
+				self.direction = 1
+
 			elif x[0] == 'r':
 				# self.servoAngle = x[1].append(x[2])
 				# self.direction = self.servoAngle
 				
-				angle = x[1]
-				angle.append(x[2])
+				angle = np.append(x[1], x[2])
 				self.setAngle(angle)
+			elif x[0] == 'RightCelebrate':
+
 				pass
+
 
 
 		self.update()

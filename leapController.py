@@ -1,13 +1,16 @@
 import sys, thread, time
-
+import numpy as np
 sys.path.insert(0, "./lib/")
 
 import Leap
+from Model.Constent import *
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QMessageBox
 from PyQt5 import QtCore
 
 class leapListener(Leap.Listener):
+	right_hand_init_point = np.array(RIGHTHAND_INITPOINT)
+
 	def on_connect(self, controller):
 		print "Connected"
 		controller.enable_gesture(Leap.Gesture.TYPE_SWIPE);
@@ -19,23 +22,37 @@ class leapListener(Leap.Listener):
 
 		for hand in frame.hands:
 			if hand.is_left:
-				handDir =  hand.direction.to_float_array()
-				handDir[0] = int(handDir[0] * 100)
-				handDir[1] = int(handDir[1] * 100)
-				handDir[2] = int(handDir[2] * 100)
-				msg += " left: (%i, %i, %i)" % (handDir[0], handDir[1], handDir[2])
-				li.append(['l', handDir])
+				if hand.grab_strength < LEFT_GRABLIMIT:
+					handDir =  hand.direction.to_float_array()
+					handDir[0] = int(handDir[0] * 100)
+					handDir[1] = int(handDir[1] * 100)
+					handDir[2] = int(handDir[2] * 100)
+					msg += " left: (%i, %i, %i)" % (handDir[0], handDir[1], handDir[2])
+					li.append(['l', handDir])
 			else:
-				strength = int(hand.grab_strength * 10)
-				handPos = hand.palm_position.to_float_array()
-				handPos[0] = int(handPos[0] * 1)
-				handPos[1] = int(handPos[1] * 1)
-				handPos[2] = int(handPos[2] * 1)
-				msg += " right: (%i, %i, %i) grab_strength: %i" % (handPos[0], handPos[1], handPos[2], strength)
-				li.append(['r', handPos, strength])
+				# If grab_strength > LEFT_GRABLIMIT, you can move, but celebrate
+				if hand.grab_strength > LEFT_GRABLIMIT:
 
-			self.activity[0] = msg
-			self.activity[1] = li
+					handPos = hand.palm_position.to_float_array()
+					self.right_hand_init_point = np.array(handPos).astype(int)
+
+				else:
+					strength = int(hand.grab_strength * 10)
+					handNewPos = hand.palm_position.to_float_array()
+
+					handPos = np.array(handNewPos).astype(int) - self.right_hand_init_point
+					msg += " right: (%i, %i, %i) grab_strength: %i" % (handPos[0], handPos[1], handPos[2], strength)
+					li.append(['r', handPos, strength])
+
+
+
+		if (frame.hands.is_empty and frame.gestures().is_empty):
+			msg  = 'No hand'
+			li.append(['NoHand'])
+
+		self.activity[0] = msg
+		self.activity[1] = li
+
 
 class LeapController(QtCore.QThread):
 	"""docstring for LeapController"""
