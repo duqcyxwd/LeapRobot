@@ -27,7 +27,7 @@ class CarEntity(QtCore.QObject):
 		for x in li:
 			if x[0] == 'l':
 				self.setSpeedByCalculate(x[1])
-				self.setdirectionByCalculate(x[2])
+				self.setDirectionByCalculate(x[2])
 
 			elif x[0] == 'NoHand':
 				self.setSpeed(0)
@@ -77,7 +77,6 @@ class CarEntity(QtCore.QObject):
 
 	def setSpeedByCalculate(self, angle):
 		self.speed = int(angle * LEFT_HAND_SPEED_CONSTANT)
-		self.update()
 
 	def setSpeed(self, speed):
 		self.speed = speed
@@ -101,19 +100,16 @@ class CarEntity(QtCore.QObject):
 		return self.direction
 
 	def setDirection(self, direction):
-		if direction > 2:
+		self.direction = direction
+		self.update()
+
+	def setDirectionByCalculate(self, direction):
+		if direction > LEFT_HAND_DIRECTION_CONSTANT:
 			self.direction = 2
-		elif direction < 0:
+		elif direction < -1 * LEFT_HAND_DIRECTION_CONSTANT:
 			self.direction = 0
 		else:
 			self.direction = 1
-		self.update()
-
-	def setdirectionByCalculate(self, direction):
-		if direction > 0:
-			self.direction = 2
-		else:
-			self.direction = 0
 
 	def goLeft(self):
 		if self.direction != 0:

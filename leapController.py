@@ -33,7 +33,7 @@ class leapListener(Leap.Listener):
 					direction = hand.direction
 
 					pitch = setValueWithRange(direction.pitch * Leap.RAD_TO_DEG, LEFT_HAND_PITCH_RANGE)
-					row = setValueWithRange(normal.roll * Leap.RAD_TO_DEG, LEFT_HAND_PITCH_RANGE)
+					row = setValueWithRange(normal.roll * Leap.RAD_TO_DEG, LEFT_HAND_ROLL_RANGE)
 
 
 					# handDir =  np.array(hand.direction.to_float_array()).astype(int) * 100
