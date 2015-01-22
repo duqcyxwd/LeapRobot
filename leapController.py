@@ -4,6 +4,8 @@ sys.path.insert(0, "./lib/")
 
 import Leap
 from Model.Constant import *
+from CommonFunction import *
+
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QMessageBox
 from PyQt5 import QtCore

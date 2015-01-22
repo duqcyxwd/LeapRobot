@@ -1,5 +1,13 @@
 import math
 
+def setValueWithinLimit(value, max, min):
+    if value > max:
+        return max
+    elif value < min:
+        return min
+    else:
+        return value
+
 def converInHex(str):
   return ",".join("{:02x}".format(ord(char)) for char in str)
 
