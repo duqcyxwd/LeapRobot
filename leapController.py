@@ -4,7 +4,7 @@ sys.path.insert(0, "./lib/")
 
 import Leap
 from Model.Constant import *
-from CommonFunction import *
+from Model.CommonFunction import *
 
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QMessageBox
@@ -32,8 +32,8 @@ class leapListener(Leap.Listener):
 					normal = hand.palm_normal
 					direction = hand.direction
 
-					pitch = direction.pitch * Leap.RAD_TO_DEG
-					row = normal.roll * Leap.RAD_TO_DEG
+					pitch = setValueWithRange(direction.pitch * Leap.RAD_TO_DEG, LEFT_HAND_PITCH_RANGE)
+					row = setValueWithRange(normal.roll * Leap.RAD_TO_DEG, LEFT_HAND_PITCH_RANGE)
 
 
 					# handDir =  np.array(hand.direction.to_float_array()).astype(int) * 100

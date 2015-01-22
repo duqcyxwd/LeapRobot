@@ -75,8 +75,8 @@ class CarEntity(QtCore.QObject):
 	def getSpeed(self):
 		return self.speed
 
-	def setSpeedByCalculate(self, spd):
-		self.speed = int(spd * LEFT_HAND_SPEED_CONSTANT)
+	def setSpeedByCalculate(self, angle):
+		self.speed = int(angle * LEFT_HAND_SPEED_CONSTANT)
 		self.update()
 
 	def setSpeed(self, speed):

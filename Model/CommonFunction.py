@@ -8,6 +8,9 @@ def setValueWithinLimit(value, max, min):
     else:
         return value
 
+def setValueWithRange(value, range_value):
+    return setValueWithinLimit(value, range_value, -range_value)
+
 def converInHex(str):
   return ",".join("{:02x}".format(ord(char)) for char in str)
 
