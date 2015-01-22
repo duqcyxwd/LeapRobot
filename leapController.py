@@ -3,7 +3,7 @@ import numpy as np
 sys.path.insert(0, "./lib/")
 
 import Leap
-from Model.Constent import *
+from Model.Constant import *
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QMessageBox
 from PyQt5 import QtCore
@@ -14,7 +14,7 @@ class leapListener(Leap.Listener):
 	rightHandResetCheck = [0, 0]
 
 	def on_connect(self, controller):
-		print "Connected"
+		print "Connected to Leap"
 		controller.enable_gesture(Leap.Gesture.TYPE_SWIPE);
 
 	def on_frame(self, controller):
@@ -26,12 +26,18 @@ class leapListener(Leap.Listener):
 			if hand.is_left:
 
 				if hand.grab_strength < LEFT_GRABLIMIT:
-					handDir =  hand.direction.to_float_array()
-					handDir[0] = int(handDir[0] * 100)
-					handDir[1] = int(handDir[1] * 100)
-					handDir[2] = int(handDir[2] * 100)
-					msg += " left: (%i, %i, %i)" % (handDir[0], handDir[1], handDir[2])
-					li.append(['l', handDir])
+
+					normal = hand.palm_normal
+					direction = hand.direction
+
+					pitch = direction.pitch * Leap.RAD_TO_DEG
+					row = normal.roll * Leap.RAD_TO_DEG
+
+
+					# handDir =  np.array(hand.direction.to_float_array()).astype(int) * 100
+					msg += " left hand, pitch: %f degree, roll: %f degree" % (pitch, row)
+					li.append(['l', pitch, row])
+
 			else:
 				# If grab_strength > LEFT_GRABLIMIT, you can move, but celebrate
 				if hand.grab_strength > LEFT_GRABLIMIT:

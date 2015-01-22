@@ -5,7 +5,7 @@ from PyQt5 import QtCore
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0,parentdir)
 
-import Model.Constent as CONSTENT
+import Model.Constant as Constant
 
 # UDP Connection
 # Socket Connection inter face
@@ -24,7 +24,7 @@ class SocketIf(QtCore.QThread):
     self.conn = 0
     self.addr = 0
 
-    self.buffersize = CONSTENT.DATABUFFERSIZE
+    self.buffersize = Constant.DATABUFFERSIZE
 
   def __str__(self):
     return "Connection to:"  + str(self.targetAddress)

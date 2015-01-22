@@ -1,0 +1,32 @@
+LOCALHOST="localhost"
+SERVER_PORT=9996
+
+INITSPEED = 0
+INITDIR = 1
+
+INISERVOANGLE1 = 15.0 # 15.0 - 150.0   Left Servo, 
+INISERVOANGLE2 = -30.0 # -30.0 - 90.0  Right Servo
+INISERVOANGLE3 = 16.0 # 16.0 - 60.0	   Grabber
+INISERVOANGLE4 = 10.0 # -16.0 - 16.0   Base
+
+DATABUFFERSIZE = 1024
+
+GRAPH_BUTTON_CHANGE_RATE = 10
+
+
+# Constant for car 
+# 
+MAX_SPEED_RANGE = 255
+
+
+# Constant for leap celebration 
+
+# ==========  Left Hand  =============
+# Speed constant : change degree to speed.
+LEFT_HAND_PITCH_RANGE = 30
+LEFT_HAND_SPEED_CONSTANT = -1 * MAX_SPEED_RANGE / LEFT_HAND_PITCH_RANGE
+
+LEFT_GRABLIMIT = 0.9
+RIGHTHAND_SCALE = 1.0
+RIGHTHAND_INITPOINT = [80 * RIGHTHAND_SCALE, 160 * RIGHTHAND_SCALE, 40 * RIGHTHAND_SCALE]
+RIGHTHAND_SHIFT = [0, -20, 0]

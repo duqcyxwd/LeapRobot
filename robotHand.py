@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 from Model.CommonFunction import *
-from Model.Constent import *
+from Model.Constant import *
 from PyQt5.QtCore import pyqtSignal, QRegExp, QSize, Qt, QTimer
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QAction, QApplication, QGridLayout, QInputDialog,

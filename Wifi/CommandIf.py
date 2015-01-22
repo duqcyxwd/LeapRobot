@@ -10,7 +10,7 @@ parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0,parentdir)
 
 from Wifi.SocketIf import SocketIf
-import Model.Constent as CONSTENT
+import Model.Constant as Constant
 from Model.CommonFunction import converInHex
 
 
@@ -23,7 +23,7 @@ class CommandIf(SocketIf):
     self.rxPacketCount = 0
     self.txPacketCount = 0
 
-    self.buffersize = CONSTENT.DATABUFFERSIZE
+    self.buffersize = Constant.DATABUFFERSIZE
     self.msgPip = []
 
     self.updateStatus = False

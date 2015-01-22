@@ -1,4 +1,4 @@
-from Model.Constent import *
+from Model.Constant import *
 from PyQt5 import QtCore
 import numpy as np
 
@@ -26,15 +26,8 @@ class CarEntity(QtCore.QObject):
 	def updateFromLeap(self, li):
 		for x in li:
 			if x[0] == 'l':
-				self.setSpeedByCalculate(x[1][1])
-				self.setdirectionByCalculate(x[1][0])
-				direct = x[1][0]
-				if direct > 20:
-					self.direction = 2
-				elif direct < -20:
-					self.direction = 0
-				else:
-					self.direction = 1
+				self.setSpeedByCalculate(x[1])
+				self.setdirectionByCalculate(x[2])
 
 			elif x[0] == 'NoHand':
 				self.setSpeed(0)
@@ -83,7 +76,7 @@ class CarEntity(QtCore.QObject):
 		return self.speed
 
 	def setSpeedByCalculate(self, spd):
-		self.speed = spd * -1
+		self.speed = int(spd * LEFT_HAND_SPEED_CONSTANT)
 		self.update()
 
 	def setSpeed(self, speed):
