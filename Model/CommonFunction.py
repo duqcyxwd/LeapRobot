@@ -34,7 +34,7 @@ def calculateFromXYZToDegree(x, y, z, l, k, h):
     ps = x4 * x4 + y4 * y4 + z4 * z4
     p = math.sqrt(ps)
     alpha1 = math.acos(( k * k + ps - l * l) / 2.0 / k / p)
-    alpha2 = math.asin(z4 / p)
+    alpha2 = math.asin(y4 / p)
 
     print alpha1
     print alpha2
