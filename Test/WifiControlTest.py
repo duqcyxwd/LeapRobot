@@ -31,6 +31,7 @@ print addr
  
 length = 15
 t= time()
+i = 0
 while 1:
     sleep(2)
     soc.setblocking(0)
@@ -48,13 +49,22 @@ while 1:
         packetCount +=1
 
     t2= time()
-    if (t2 - t) > 20:
-        print "send new command"
+    if (t2 - t) > 10:
+        i += 1
+        if i == 10:
+            print "speed is 0000"
+            speed = 0
+        if i == 20:
+            print "reverse speed"
+            speed = 150
+            pass
+
+        # print "send new command"
         # if speed > - 150 :
         #     speed -= 10
         # elif speed < 150:
         #     speed += 4
 
-        speed = speed * -1
+        # speed = speed * -1
 
         di = (di + 1)%3
