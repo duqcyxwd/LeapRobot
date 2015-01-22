@@ -41,42 +41,29 @@ class leapListener(Leap.Listener):
 					li.append(['l', pitch, row])
 
 			else:
-				# If grab_strength > LEFT_GRABLIMIT, you can move, but celebrate
+				# If grab_strength > LEFT_GRABLIMIT, you can't move robot arm, but celebrate
 				if hand.grab_strength > LEFT_GRABLIMIT:
 
 					handPos = np.array(hand.palm_position.to_float_array()).astype(int)
 
 					self.grabLocation = (handPos + RIGHTHAND_SHIFT) * RIGHTHAND_SCALE
-					self.right_hand_init_point = (handPos + RIGHTHAND_SHIFT) * RIGHTHAND_SCALE - self.oldPosition
+					self.right_hand_init_point = (handPos + RIGHTHAND_SHIFT) * RIGHTHAND_SCALE - self.handOldPosition
 
 				else:
-
-					normal = hand.palm_normal
-					direction = hand.direction
-					# Calculate roll degree
-					row = normal.roll * Leap.RAD_TO_DEG
-
-					if row > 40:
-						self.rightHandResetCheck[1] = 1
-					elif row < -30:
-						self.rightHandResetCheck[0] = 1
-					
+					#  Moving arm
 					strength = int(hand.grab_strength * 10)
 					handNewPos = np.array(hand.palm_position.to_float_array()).astype(int) * RIGHTHAND_SCALE
 
-					handOldPosition = handNewPos - self.right_hand_init_point
+					self.handOldPosition = handNewPos - self.right_hand_init_point
 
-					self.oldPosition = handOldPosition
-
-					#  -30 to 70 degree to reset init position
-					if self.rightHandResetCheck == [1, 1]:
+					if self.checkResetGesture(hand):
 						print "reset right hand position"
 						self.rightHandResetCheck = [0, 0]
-						self.right_hand_init_point = handNewPos + RIGHTHAND_SHIFT
+						# self.right_hand_init_point = handNewPos + RIGHTHAND_SHIFT
+						self.right_hand_init_point = handNewPos
 
-
-					msg += " right: (%i, %i, %i) grab_strength: %i" % (handOldPosition[0], handOldPosition[1], handOldPosition[2], strength)
-					li.append(['r', handOldPosition, strength])
+					msg += " right: (%i, %i, %i) grab_strength: %i" % (self.handOldPosition[0], self.handOldPosition[1], self.handOldPosition[2], strength)
+					li.append(['r', self.handOldPosition, strength])
 
 
 
@@ -86,6 +73,17 @@ class leapListener(Leap.Listener):
 
 		self.activity[0] = msg
 		self.activity[1] = li
+
+	def checkResetGesture(self, hand):
+		#  Check Gesture, 
+		# Calculate roll degree
+		row = hand.palm_normal.roll * Leap.RAD_TO_DEG
+		if row > 30:
+			self.rightHandResetCheck[1] = 1
+		elif row < -30:
+			self.rightHandResetCheck[0] = 1
+
+		return (self.rightHandResetCheck == [1, 1])
 
 
 class LeapController(QtCore.QThread):
