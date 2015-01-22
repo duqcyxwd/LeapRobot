@@ -18,6 +18,7 @@ def approach(num, num2, appoachRate):
 def calculateFromXYZToDegree(x, y, z, l, k, h):
 
     z =-z
+    print [x, y, z, l, k, h] 
 
     angleBase = math.atan(z/x)
 
@@ -34,9 +35,11 @@ def calculateFromXYZToDegree(x, y, z, l, k, h):
 
 
     alpha = alpha/math.pi*180.0
+    angleBase = angleBase/math.pi*180.0
+    beta = beta/math.pi*180.0
     print alpha
 
-    return [angleBase/math.pi*180.0, alpha, beta/math.pi*180.0]
+    return [angleBase, alpha, beta]
 
 
 if __name__ == '__main__':
