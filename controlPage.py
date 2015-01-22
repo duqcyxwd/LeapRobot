@@ -83,7 +83,9 @@ class ControlPage(base_class, form_class):
 		self.servo0.setText(str(servo[0]))
 		self.servo1.setText(str(servo[1]))
 		self.servo2.setText(str(servo[2]))
-		self.servo3.setText(str(servo[3]))	
+		self.servo3.setText(str(servo[3]))
+
+		self.label_9.setText(str(self.carEntity.rightHandXYZ))
 		
 
 

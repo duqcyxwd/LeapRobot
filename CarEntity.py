@@ -18,6 +18,7 @@ class CarEntity(QtCore.QObject):
 		self.setSpeed(INITSPEED)
 		self.setDirection(INITDIR)
 		self.setAngle([INISERVOANGLE1, INISERVOANGLE2, INISERVOANGLE3, INISERVOANGLE4])
+		self.rightHandXYZ = [1, 1, 1]
 
 		self.dataChangeRateByButton = GRAPH_BUTTON_CHANGE_RATE
 		self.isReady = True
@@ -48,7 +49,8 @@ class CarEntity(QtCore.QObject):
 
 				print x[1]
 
-				angle = calculateFromXYZToDegree(angle[0], angle[1], angle[2], 80, 80, 68)
+				self.rightHandXYZ = x[1]
+				angle = calculateFromXYZToDegree(angle[0], angle[1], angle[2], 70, 60, 20)
 				
 				angle.append(x[2])
 
@@ -77,6 +79,7 @@ class CarEntity(QtCore.QObject):
 	def update(self):
 		if self.isReady:
 			updateMsg = [self.speed, self.direction, self.servoAngle[0], self.servoAngle[1], self.servoAngle[2], self.servoAngle[3]]
+			self.updateAngle()
 			self.updateSignal.emit(updateMsg)
 
 	def getSpeed(self):
@@ -164,45 +167,70 @@ class CarEntity(QtCore.QObject):
 
 
 	def servo1up(self):
-		angl = self.servoAngle
-		self.servoAngle[0] += self.dataChangeRateByButton
+		# angl = self.servoAngle
+		# self.servoAngle[0] += self.dataChangeRateByButton
+		# 
+		self.rightHandXYZ[0] += 1
 		self.update()
 
 	def servo1down(self):
-		angl = self.servoAngle
-		self.servoAngle[0] -= self.dataChangeRateByButton
+
+		self.rightHandXYZ[0] -= 1
+
+		# angl = self.servoAngle
+		# self.servoAngle[0] -= self.dataChangeRateByButton
 		self.update()
 
 	def servo2up(self):
-		angl = self.servoAngle
-		self.servoAngle[1] += self.dataChangeRateByButton
+
+		self.rightHandXYZ[1] += 1
+
+		# angl = self.servoAngle
+		# self.servoAngle[1] += self.dataChangeRateByButton
 		self.update()
 
 	def servo2down(self):
-		angl = self.servoAngle
-		self.servoAngle[1] -= self.dataChangeRateByButton
+
+		self.rightHandXYZ[1] -= 1
+
+		# angl = self.servoAngle
+		# self.servoAngle[1] -= self.dataChangeRateByButton
 		self.update()
 
 	def servo3up(self):
-		angl = self.servoAngle
-		self.servoAngle[2] += self.dataChangeRateByButton
+
+		self.rightHandXYZ[2] += 1
+
+		# angl = self.servoAngle
+		# self.servoAngle[2] += self.dataChangeRateByButton
 		self.update()
 
 	def servo3down(self):
-		angl = self.servoAngle
-		self.servoAngle[2] -= self.dataChangeRateByButton
+
+		self.rightHandXYZ[2] -= 1
+
+		# angl = self.servoAngle
+		# self.servoAngle[2] -= self.dataChangeRateByButton
 		self.update()
 
 	def servo4up(self):
-		angl = self.servoAngle
-		self.servoAngle[3] += self.dataChangeRateByButton
+
+		# angl = self.servoAngle
+		# self.servoAngle[3] += self.dataChangeRateByButton
 		self.update()
 
 	def servo4down(self):
-		angl = self.servoAngle
-		self.servoAngle[3] -= self.dataChangeRateByButton
+
+		# angl = self.servoAngle
+		# self.servoAngle[3] -= self.dataChangeRateByButton
 		self.update()
 
+	def updateAngle(self):
+
+		
+		angle = calculateFromXYZToDegree(self.rightHandXYZ[0], self.rightHandXYZ[1], self.rightHandXYZ[2], 70, 60, 20)
+		angle.append(self.servoAngle[3])
+		self.servoAngle = angle
 
 
 

@@ -38,7 +38,6 @@ class GLWidget(QGLWidget):
         self.gear3angle = INISERVOANGLE3 * math.pi / 180.0     # plier
         self.gear4angle = INISERVOANGLE4 * math.pi / 180.0     # head
 
-
         self.gear1angle2 = self.gear1angle
         self.gear2angle2 = self.gear2angle
         self.gear3angle2 = self.gear3angle
@@ -504,10 +503,15 @@ class GLWidget(QGLWidget):
 
 
     def smoothMove(self):
-        self.gear1angle = approach(self.gear1angle, self.gear1angle2, self.moveSpeed)
-        self.gear2angle = approach(self.gear2angle, self.gear2angle2, self.moveSpeed)
-        self.gear3angle = approach(self.gear3angle, self.gear3angle2, self.moveSpeed)
-        self.gear4angle = approach(self.gear4angle, self.gear4angle2, self.moveSpeed)
+        # self.gear1angle = approach(self.gear1angle, self.gear1angle2, self.moveSpeed)
+        # self.gear2angle = approach(self.gear2angle, self.gear2angle2, self.moveSpeed)
+        # self.gear3angle = approach(self.gear3angle, self.gear3angle2, self.moveSpeed)
+        # self.gear4angle = approach(self.gear4angle, self.gear4angle2, self.moveSpeed)
+
+        self.gear1angle = self.gear1angle2
+        self.gear2angle = self.gear2angle2
+        self.gear3angle = self.gear3angle2
+        self.gear4angle = self.gear4angle2
 
 
 if __name__ == '__main__':

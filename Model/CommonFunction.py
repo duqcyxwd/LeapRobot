@@ -17,6 +17,7 @@ def approach(num, num2, appoachRate):
 
 def calculateFromXYZToDegree(x, y, z, l, k, h):
 
+    z =-z
 
     angleBase = math.atan(z/x)
 
