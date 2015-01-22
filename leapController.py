@@ -11,9 +11,9 @@ from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QMessag
 from PyQt5 import QtCore
 
 class leapListener(Leap.Listener):
-	right_hand_init_point = np.array(RIGHTHAND_INITPOINT)
-	oldPosition = np.array(RIGHTHAND_INITPOINT)
 	rightHandResetCheck = [0, 0]
+	right_hand_idea_central = np.array(RIGHTHAND_INITPOINT)
+	arm_position_respect_to_idea_central = np.array(RIGHTHAND_INITPOINT)
 
 	def on_connect(self, controller):
 		print "Connected to Leap"
@@ -27,7 +27,7 @@ class leapListener(Leap.Listener):
 		for hand in frame.hands:
 			if hand.is_left:
 
-				if hand.grab_strength < LEFT_GRABLIMIT:
+				if hand.grab_strength < GRAB_LIMIT:
 
 					normal = hand.palm_normal
 					direction = hand.direction
@@ -41,29 +41,29 @@ class leapListener(Leap.Listener):
 					li.append(['l', pitch, row])
 
 			else:
-				# If grab_strength > LEFT_GRABLIMIT, you can't move robot arm, but celebrate
-				if hand.grab_strength > LEFT_GRABLIMIT:
+				# If grab_strength > GRAB_LIMIT, you can't move robot arm, but celebrate
+				if hand.grab_strength > GRAB_LIMIT:
 
 					handPos = np.array(hand.palm_position.to_float_array()).astype(int)
-
-					self.grabLocation = (handPos + RIGHTHAND_SHIFT) * RIGHTHAND_SCALE
-					self.right_hand_init_point = (handPos + RIGHTHAND_SHIFT) * RIGHTHAND_SCALE - self.handOldPosition
+					self.right_hand_idea_central = (handPos + RIGHTHAND_SHIFT) - self.arm_position_respect_to_idea_central
 
 				else:
 					#  Moving arm
-					strength = int(hand.grab_strength * 10)
-					handNewPos = np.array(hand.palm_position.to_float_array()).astype(int) * RIGHTHAND_SCALE
+					strength = int(hand.grab_strength * RIGHTHAND_GRABSTRENGTH_SCALE)
+					handNewPos = np.array(hand.palm_position.to_float_array()).astype(int)
 
-					self.handOldPosition = handNewPos - self.right_hand_init_point
+					self.arm_position_respect_to_idea_central = handNewPos - self.right_hand_idea_central
 
 					if self.checkResetGesture(hand):
 						print "reset right hand position"
 						self.rightHandResetCheck = [0, 0]
-						# self.right_hand_init_point = handNewPos + RIGHTHAND_SHIFT
-						self.right_hand_init_point = handNewPos
 
-					msg += " right: (%i, %i, %i) grab_strength: %i" % (self.handOldPosition[0], self.handOldPosition[1], self.handOldPosition[2], strength)
-					li.append(['r', self.handOldPosition, strength])
+						#  If something lag, use this instead of idea central from calculate
+						# self.right_hand_idea_central = handNewPos
+						self.right_hand_idea_central = handNewPos + (RIGHTHAND_SHIFT)
+
+					msg += " right: (%i, %i, %i) grab_strength: %i" % (self.arm_position_respect_to_idea_central[0], self.arm_position_respect_to_idea_central[1], self.arm_position_respect_to_idea_central[2], strength)
+					li.append(['r', self.arm_position_respect_to_idea_central, strength])
 
 
 
