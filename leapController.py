@@ -10,6 +10,7 @@ from PyQt5 import QtCore
 
 class leapListener(Leap.Listener):
 	right_hand_init_point = np.array(RIGHTHAND_INITPOINT)
+	oldPosition = np.array(RIGHTHAND_INITPOINT)
 
 	def on_connect(self, controller):
 		print "Connected"
@@ -34,15 +35,20 @@ class leapListener(Leap.Listener):
 				if hand.grab_strength > LEFT_GRABLIMIT:
 
 					handPos = np.array(hand.palm_position.to_float_array()).astype(int)
-					self.right_hand_init_point = handPos * RIGHTHAND_SCALE
+
+					self.grabLocation = (handPos + RIGHTHAND_SHIFT) * RIGHTHAND_SCALE
+					self.right_hand_init_point = (handPos + RIGHTHAND_SHIFT) * RIGHTHAND_SCALE - self.oldPosition
 
 				else:
 					strength = int(hand.grab_strength * 10)
 					handNewPos = np.array(hand.palm_position.to_float_array()).astype(int) * RIGHTHAND_SCALE
 
-					handPos = handNewPos - self.right_hand_init_point
-					msg += " right: (%i, %i, %i) grab_strength: %i" % (handPos[0], handPos[1], handPos[2], strength)
-					li.append(['r', handPos, strength])
+					handOldPosition = handNewPos - self.right_hand_init_point
+
+					self.oldPosition = handOldPosition
+
+					msg += " right: (%i, %i, %i) grab_strength: %i" % (handOldPosition[0], handOldPosition[1], handOldPosition[2], strength)
+					li.append(['r', handOldPosition, strength])
 
 
 

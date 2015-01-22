@@ -17,27 +17,31 @@ def approach(num, num2, appoachRate):
 
 def calculateFromXYZToDegree(x, y, z, l, k, h):
 
-    z = -1.0 *z
-    y = y * 1.0
-    x = x * 1.0
+    x1 = z * 1.0
+    y1 = y * 1.0
+    z1 = x * 1.0
+
     l = l * 1.0
     k = k * 1.0
     h = h * 1.0
 
     # print [x, y, z, l, k, h] 
+    if x1 == 0 or z > 0:
+        return False
+    angleBase = math.atan(z1/x1)
 
-    angleBase = math.atan(z/x)
-
-    x4 = x + h * math.cos(angleBase)
-    y4 = y
-    z4 = z + h * math.sin(angleBase)
+    x4 = x1 + h * math.cos(angleBase)
+    y4 = y1
+    z4 = z1 + h * math.sin(angleBase)
     ps = x4 * x4 + y4 * y4 + z4 * z4
     p = math.sqrt(ps)
+    if  p < l - k or p > l + k:
+        return False
+
     alpha1 = math.acos(( k * k + ps - l * l) / 2.0 / k / p)
     alpha2 = math.asin(y4 / p)
 
-    print alpha1
-    print alpha2
+
 
     alpha = alpha1 - alpha2
     beta1 = math.acos((k * k + l * l - ps) / 2.0 / k / l)

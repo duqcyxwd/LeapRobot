@@ -46,15 +46,12 @@ class CarEntity(QtCore.QObject):
 				
 
 				angle = x[1] 
-
-				print x[1]
-
 				self.rightHandXYZ = x[1]
 				angle = calculateFromXYZToDegree(angle[0], angle[1], angle[2], 70, 60, 20)
 				
-				angle.append(x[2])
-
-				self.setAngle(angle)
+				if angle != False:
+					angle.append(x[2])
+					self.setAngle(angle)
 
 
 			elif x[0] == 'RightCelebrate':
@@ -79,7 +76,7 @@ class CarEntity(QtCore.QObject):
 	def update(self):
 		if self.isReady:
 			updateMsg = [self.speed, self.direction, self.servoAngle[0], self.servoAngle[1], self.servoAngle[2], self.servoAngle[3]]
-			self.updateAngle()
+			# self.updateAngle()
 			self.updateSignal.emit(updateMsg)
 
 	def getSpeed(self):
