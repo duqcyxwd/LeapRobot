@@ -10,8 +10,6 @@ from Model import *
 
 form_class, base_class = loadUiType('View/controlPage.ui')
 class ControlPage(base_class, form_class):
-	# updateSignal = pyqtSignal(list)
-
 	def __init__(self, *args):
 		super(ControlPage, self).__init__(*args)
 		self.setupUi(self)

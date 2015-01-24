@@ -24,8 +24,11 @@ class leapListener(Leap.Listener):
 		msg = ''
 		li = []
 
+		hasLeftHand = False
+
 		for hand in frame.hands:
 			if hand.is_left:
+				hasLeftHand = True
 
 				if hand.grab_strength < LEFT_GRABLIMIT:
 
@@ -34,7 +37,6 @@ class leapListener(Leap.Listener):
 
 					pitch = setValueWithRange(direction.pitch * Leap.RAD_TO_DEG, LEFT_HAND_PITCH_RANGE)
 					row = setValueWithRange(normal.roll * Leap.RAD_TO_DEG, LEFT_HAND_ROLL_RANGE)
-
 
 					# handDir =  np.array(hand.direction.to_float_array()).astype(int) * 100
 					msg += " left hand, pitch: %f degree, roll: %f degree" % (pitch, row)
@@ -65,11 +67,12 @@ class leapListener(Leap.Listener):
 					msg += " right: (%i, %i, %i) grab_strength: %i" % (self.handOldPosition[0], self.handOldPosition[1], self.handOldPosition[2], strength)
 					li.append(['r', self.handOldPosition, strength])
 
-
-
 		if (frame.hands.is_empty and frame.gestures().is_empty):
-			msg  = 'No hand'
-			li.append(['NoHand'])
+			msg  += ' No Hand Detected '
+			li.append(['nh'])
+		elif not hasLeftHand:
+			msg  += " Can't detect left hand "
+			li.append(['nl'])
 
 		self.activity[0] = msg
 		self.activity[1] = li
