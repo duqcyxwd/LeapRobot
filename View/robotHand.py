@@ -55,6 +55,7 @@ class RobotHandWidget(QGLWidget):
         timer.timeout.connect(self.advanceGears)
         timer.timeout.connect(self.updateArmPosition)
         timer.timeout.connect(self.updateGL)
+        # timer.start(1000/FPS)
         timer.start(20)
 
         # Update target position per 100ms
@@ -62,8 +63,8 @@ class RobotHandWidget(QGLWidget):
         timer2.timeout.connect(self.getCarInfo)
         timer2.start(100)
 
-        self.moveSpeed = 0.1
-        self.smoothUpdate =  True
+        self.smoothUpdate =  SMOOTH_UPDATE_MODEL
+        self.ArmMoveSpeed = ARM_MOVE_RATE # This only works if Smooth update model is true
 
     def setCarEntity(self, carEntity):
         self.carEntity = carEntity
@@ -492,10 +493,10 @@ class RobotHandWidget(QGLWidget):
     def updateArmPosition(self):
 
         if self.smoothUpdate == True:
-            self.gear1angle = approach(self.gear1angle, self.gear1angle2, self.moveSpeed)
-            self.gear2angle = approach(self.gear2angle, self.gear2angle2, self.moveSpeed)
-            self.gear3angle = approach(self.gear3angle, self.gear3angle2, self.moveSpeed)
-            self.gear4angle = approach(self.gear4angle, self.gear4angle2, self.moveSpeed)
+            self.gear1angle = approach(self.gear1angle, self.gear1angle2, self.ArmMoveSpeed)
+            self.gear2angle = approach(self.gear2angle, self.gear2angle2, self.ArmMoveSpeed)
+            self.gear3angle = approach(self.gear3angle, self.gear3angle2, self.ArmMoveSpeed)
+            self.gear4angle = approach(self.gear4angle, self.gear4angle2, self.ArmMoveSpeed)
 
         else :
             self.gear1angle = self.gear1angle2
@@ -509,4 +510,4 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     mainWin = GLWidget()
     mainWin.show()
-    sys.exit(app.exec_())    
+    sys.exit(app.exec_())

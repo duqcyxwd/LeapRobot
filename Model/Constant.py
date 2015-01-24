@@ -21,9 +21,8 @@ GRAPH_BUTTON_CHANGE_RATE = 10
 MAX_SPEED_RANGE = 255
 
 
+# ==========  LEAP  =============
 # Constant for leap celebration 
-
-# ==========  Left Hand  =============
 # Speed constant : change degree to speed.
 LEFT_HAND_PITCH_RANGE = 30
 LEFT_HAND_SPEED_CONSTANT = -1.0 * MAX_SPEED_RANGE / LEFT_HAND_PITCH_RANGE
@@ -34,3 +33,10 @@ LEFT_GRABLIMIT = 0.9
 RIGHTHAND_SCALE = 1.0
 RIGHTHAND_INITPOINT = [80 * RIGHTHAND_SCALE, 160 * RIGHTHAND_SCALE, 40 * RIGHTHAND_SCALE]
 RIGHTHAND_SHIFT = [0, -20, 0]
+
+# ==========  OpenGl  =============
+FPS = 60
+SMOOTH_UPDATE_MODEL = True
+ARM_MOVE_SPEED = 6.0					# This only works if Smooth update model is true
+ARM_MOVE_RATE = ARM_MOVE_SPEED/FPS		# This only works if Smooth update model is true
+
