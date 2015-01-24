@@ -4,26 +4,17 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5.uic import loadUiType
 
-from robotHand import RobotHandWidget
-from CarEntity import CarEntity
+from View.robotHand import RobotHandWidget
+from Model import *
 
 
-app = QApplication(sys.argv)
-form_class, base_class = loadUiType('controlPage.ui')
+form_class, base_class = loadUiType('View/controlPage.ui')
 class ControlPage(base_class, form_class):
 	# updateSignal = pyqtSignal(list)
 
 	def __init__(self, *args):
 		super(ControlPage, self).__init__(*args)
 		self.setupUi(self)
-
-
-
-		# carEntity = CarEntity()
-		# self.setCarEntity(carEntity)
-
-
-
 
 	# connect carEntity and setup all connection between entity and action
 	def setCarEntity(self, carEntity):
@@ -91,6 +82,8 @@ class ControlPage(base_class, form_class):
 
 
 if __name__ == '__main__':
+
+	app = QApplication(sys.argv)
 
 	controllPage = ControlPage()
 	controllPage.show()

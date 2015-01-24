@@ -4,7 +4,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QMessageBox
 from PyQt5.uic import loadUi
 
-from controlPage import ControlPage
+from View.controlPage import ControlPage
 
 class MainWindow(QMainWindow):
 	startLeapSignal = QtCore.pyqtSignal()
@@ -18,7 +18,7 @@ class MainWindow(QMainWindow):
 	def __init__(self, *args):
 		super(MainWindow, self).__init__(*args)
 
-		loadUi('MainWindow.ui', self)
+		loadUi('View/MainWindow.ui', self)
 		self.actionTesting.triggered.connect(self.testing)
 		self.actionAbout_us.triggered.connect(self.openAbout)
 
