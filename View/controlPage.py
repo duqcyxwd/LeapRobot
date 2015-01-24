@@ -44,7 +44,7 @@ class ControlPage(base_class, form_class):
 		self.handWidget.setCarEntity(self.carEntity)
 
 		self.robothandLayout.addWidget(self.handWidget)
-		self.carEntity.updateSignal.connect(self.handWidget.updateGraph)
+		self.carEntity.updateSignal.connect(self.handWidget.setUpdateFlag)
 
 
 	@pyqtSlot()

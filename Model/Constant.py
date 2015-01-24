@@ -1,5 +1,7 @@
-LOCALHOST="localhost"
-SERVER_PORT=9996
+# This is a File Contains all the configuration data and All the Constant
+
+LOCALHOST=""
+SERVER_PORT=55555
 
 INITSPEED = 0
 INITDIR = 1

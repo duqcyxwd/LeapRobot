@@ -1,10 +1,15 @@
-from  main_run import LeapArm
+
 import time
+import os
+from os.path import dirname, abspath
+parentdir = dirname(dirname(abspath(__file__)))
+os.sys.path.insert(0,parentdir)
 
+from  Model.HMobileArm import HMobileArm
 
-leapArm = LeapArm()
+hMobileArm = HMobileArm()
 
 # time.sleep(1)
-# leapArm.startLeapController()
-leapArm.mw.on_newtab_pressed()
-leapArm.run()
+# hMobileArm.startLeapController()
+hMobileArm.mw.on_newtab_pressed()
+hMobileArm.run()

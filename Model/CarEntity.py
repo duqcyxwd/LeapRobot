@@ -52,8 +52,6 @@ class CarEntity(QtCore.QObject):
 	def updateData(self, data):
 		#if data changed
 		#emit signal
-		# print 'updateData called'
-		# print data
 		self.speed = data[0]
 		self.direction = data[1]
 		self.servoAngle = data[2]

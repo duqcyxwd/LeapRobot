@@ -41,7 +41,7 @@ class HMobileArm(QtCore.QObject):
 		# Todo: Add icon to display connection states. 
 		self.mw.addLog("start new Connection")
   		
-  		self.command_if_thread = CommandIf('', 55555)
+  		self.command_if_thread = CommandIf(LOCALHOST, SERVER_PORT)
 
 		self.carEntity.updateSignal.connect(self.command_if_thread.update)
 		

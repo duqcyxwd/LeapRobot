@@ -16,7 +16,7 @@ try:
 except ImportError:
     app = QApplication(sys.argv)
     QMessageBox.critical(None, "OpenGL grabber",
-            "PyOpenGL must be installed to run this example.")
+            "PyOpenGL must be installed to run this widget.")
     sys.exit(1)
 
 
@@ -53,22 +53,17 @@ class RobotHandWidget(QGLWidget):
         # Update graph per 20ms
         timer = QTimer(self)
         timer.timeout.connect(self.advanceGears)
-        timer.timeout.connect(self.smoothMove)
+        timer.timeout.connect(self.updateArmPosition)
         timer.timeout.connect(self.updateGL)
         timer.start(20)
 
         # Update target position per 100ms
         timer2 = QTimer(self)
-        timer2.timeout.connect(self.updateGraph2)
+        timer2.timeout.connect(self.getCarInfo)
         timer2.start(100)
 
-        self.moveSpeed = 0.01
-
-
-        # timer3 = QTimer(self)
-        # timer3.timeout.connect(self.testing)
-        # timer3.start(3000)
-
+        self.moveSpeed = 0.1
+        self.smoothUpdate =  True
 
     def setCarEntity(self, carEntity):
         self.carEntity = carEntity
@@ -230,7 +225,6 @@ class RobotHandWidget(QGLWidget):
         self.lastPos = event.pos()
 
     def advanceGears(self):
-
         self.gear1Rot += self.speed * 2
 
     def xRotation(self):
@@ -466,12 +460,13 @@ class RobotHandWidget(QGLWidget):
             angle -= 360
 
 
-    def updateGraph(self):
+    def setUpdateFlag(self):
         self.isUpdate = True
 
 
 
-    def updateGraph2(self):
+    def getCarInfo(self):
+        # Update Information fro CarEntity
         if self.isUpdate:
             self.isUpdate = False
             self.speed = self.carEntity.getSpeed()
@@ -494,24 +489,19 @@ class RobotHandWidget(QGLWidget):
             self.gear3angle2 = servo[3] * math.pi / 180.0
             self.gear4angle2 = servo[0] * math.pi / 180.0
 
+    def updateArmPosition(self):
 
-    # def testing(self):
-    #     self.gear1angle2 = INISERVOANGLE1 * math.pi / 180.0 * 2     # red body
-    #     self.gear2angle2 = INISERVOANGLE2 * math.pi / 180.0 * 2     # green body
-    #     self.gear3angle2 = INISERVOANGLE3 * math.pi / 180.0 * 2     # plier
-    #     self.gear4angle2 = INISERVOANGLE4 * math.pi / 180.0 * 2     # head
+        if self.smoothUpdate == True:
+            self.gear1angle = approach(self.gear1angle, self.gear1angle2, self.moveSpeed)
+            self.gear2angle = approach(self.gear2angle, self.gear2angle2, self.moveSpeed)
+            self.gear3angle = approach(self.gear3angle, self.gear3angle2, self.moveSpeed)
+            self.gear4angle = approach(self.gear4angle, self.gear4angle2, self.moveSpeed)
 
-
-    def smoothMove(self):
-        # self.gear1angle = approach(self.gear1angle, self.gear1angle2, self.moveSpeed)
-        # self.gear2angle = approach(self.gear2angle, self.gear2angle2, self.moveSpeed)
-        # self.gear3angle = approach(self.gear3angle, self.gear3angle2, self.moveSpeed)
-        # self.gear4angle = approach(self.gear4angle, self.gear4angle2, self.moveSpeed)
-
-        self.gear1angle = self.gear1angle2
-        self.gear2angle = self.gear2angle2
-        self.gear3angle = self.gear3angle2
-        self.gear4angle = self.gear4angle2
+        else :
+            self.gear1angle = self.gear1angle2
+            self.gear2angle = self.gear2angle2
+            self.gear3angle = self.gear3angle2
+            self.gear4angle = self.gear4angle2
 
 
 if __name__ == '__main__':
