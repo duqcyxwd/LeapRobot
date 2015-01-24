@@ -20,13 +20,13 @@ except ImportError:
     sys.exit(1)
 
 
-class GLWidget(QGLWidget):
+class RobotHandWidget(QGLWidget):
     xRotationChanged = pyqtSignal(int)
     yRotationChanged = pyqtSignal(int)
     zRotationChanged = pyqtSignal(int)
 
     def __init__(self, parent=None):
-        super(GLWidget, self).__init__(parent)
+        super(RobotHandWidget, self).__init__(parent)
 
         self.xRot = 0   # initial angle of view
         self.yRot = 0   # initial angle of view

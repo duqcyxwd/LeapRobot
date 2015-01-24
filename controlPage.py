@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5.uic import loadUiType
 
-from robotHand import GLWidget
+from robotHand import RobotHandWidget
 from CarEntity import CarEntity
 
 
@@ -25,7 +25,7 @@ class ControlPage(base_class, form_class):
 
 
 
-
+	# connect carEntity and setup all connection between entity and action
 	def setCarEntity(self, carEntity):
 		self.carEntity = carEntity;
 		self.carEntity.updateSignal.connect(self.updateCarInterface)
@@ -51,18 +51,12 @@ class ControlPage(base_class, form_class):
 
 		self.updateCarInterface()
 
-		handWidget = GLWidget()
-		self.handWidget = handWidget
-
+		self.handWidget = RobotHandWidget()
 		self.handWidget.setCarEntity(self.carEntity)
 
-
-		self.robothandLayout.addWidget(handWidget)
+		self.robothandLayout.addWidget(self.handWidget)
 		self.carEntity.updateSignal.connect(self.handWidget.updateGraph)
 
-
-	# def updateModel(self):
-	# 	self.updateSignal.emit([50, 1, [2, 3, 4, 5]])
 
 	@pyqtSlot()
 	def updateCarInterface(self, dataList = []):
