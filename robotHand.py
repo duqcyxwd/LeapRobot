@@ -32,11 +32,18 @@ class GLWidget(QGLWidget):
         self.yRot = 0   # initial angle of view
         self.zRot = 0   # initial angle of view
 
+        self.w = 3.0
+        self.l = 7.0
+        self.k = 6.0
+        self.h = 2.0
+        self.b = 4.0    # base connection length
+        self.p = 2.0    # piter length
+
         self.speed = INITSPEED
-        self.gear1angle = INISERVOANGLE1 * math.pi / 180.0     # red body
-        self.gear2angle = INISERVOANGLE2 * math.pi / 180.0     # green body
-        self.gear3angle = INISERVOANGLE3 * math.pi / 180.0     # plier
-        self.gear4angle = INISERVOANGLE4 * math.pi / 180.0     # head
+        self.gear1angle = INISERVOANGLE1 * math.pi / 180.0     # red body   -   alpha
+        self.gear2angle = INISERVOANGLE2 * math.pi / 180.0     # green body -   beta
+        self.gear3angle = INISERVOANGLE3 * math.pi / 180.0     # plier      -
+        self.gear4angle = INISERVOANGLE4 * math.pi / 180.0     # head       -   theta(angleBase)
 
         self.gear1angle2 = self.gear1angle
         self.gear2angle2 = self.gear2angle
@@ -110,16 +117,16 @@ class GLWidget(QGLWidget):
         glEnable(GL_LIGHT0)
         glEnable(GL_DEPTH_TEST)
 
-        self.box1 = self.box(reflectance1, 3.0, 1.0, 0.1)    # red 1
-        self.box2 = self.box(reflectance2, 7.0, 1.0, 0.1)    # green 1
-        self.box3 = self.box(reflectance1, 9.0, 1.0, 0.1)    # red 2 connects plier
-        self.box4 = self.box(reflectance2, 7.0, 1.0, 0.1)    # green 2
-        self.box5 = self.box(reflectance3, 4.0, 1.0, 1.0)    # bottom blue
-        self.box6 = self.box(reflectance3, 2.0, 1.0, 0.1)    # hand blue
-        self.box7 = self.box(reflectance4, 2.0, 1.0, 0.1)    # hand yellow 1
-        self.box8 = self.box(reflectance4, 2.0, 1.0, 0.1)    # hand yellow 2
-        self.box9 = self.box(reflectance5, 2.0, 0.2, 1.0)    # hand yellow 2
-        self.box10 = self.box(reflectance5, 2.0, 0.2, 1.0)    # hand yellow 2
+        self.box1 = self.box(reflectance1, self.w, 1.0, 0.1)    # red 1
+        self.box2 = self.box(reflectance2, self.l, 1.0, 0.1)    # green 1
+        self.box3 = self.box(reflectance1, self.w+self.k, 1.0, 0.1)    # red 2 connects plier
+        self.box4 = self.box(reflectance2, self.k, 1.0, 0.1)    # green 2
+        self.box5 = self.box(reflectance3, self.b, 1.0, 1.0)    # bottom blue
+        self.box6 = self.box(reflectance3, self.h, 1.0, 0.1)    # hand blue
+        self.box7 = self.box(reflectance4, self.p, 1.0, 0.1)    # hand yellow 1
+        self.box8 = self.box(reflectance4, self.p, 1.0, 0.1)    # hand yellow 2
+        self.box9 = self.box(reflectance5, self.p, 0.2, 1.0)    # hand purple 1
+        self.box10 = self.box(reflectance5, self.p, 0.2, 1.0)    # hand purple 2
 
         self.cylinder1 = self.cylinder(reflectance1, 0.5, 1.0)
         self.cylinder2 = self.cylinder(reflectance2, 0.5, 1.0)
@@ -130,7 +137,6 @@ class GLWidget(QGLWidget):
         self.cylinder7 = self.cylinder(reflectance2, 0.5, 1.0)
         self.cylinder8 = self.cylinder(reflectance1, 0.5, 1.0)
         self.cylinder9 = self.cylinder(reflectance3, 0.5, 1.0)
-        # self.cylinder1 = self.cylinder(reflectance1, 0.5, 1.0)
         self.cylinder10 = self.cylinder(reflectance3, 0.5, 1.0)
 
         self.tire1 = self.tire(reflectance2, 2.0, 2.0, 1.0, 20)
@@ -155,40 +161,48 @@ class GLWidget(QGLWidget):
         glRotated(self.yRot, 0.0, 1.0, 0.0)
         glRotated(self.zRot, 0.0, 0.0, 1.0)
 
-        self.x1 = 3.0 * math.cos(self.gear1angle)
-        self.y1 = 3.0 * math.sin(self.gear1angle)
-        self.x2 = -7.0 * math.sin(self.gear2angle)
-        self.y2 = 7.0 * math.cos(self.gear2angle)
+        self.x0 = 0.0
+        self.y0 = 0.0
+        self.z0 = 0.0
 
-        self.drawBox(self.box1, 0.0, 0.0, 0.0, 180 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
-        self.drawBox(self.box2, self.x1, self.y1, 1.0, 180 / math.pi * (math.pi / 2.0 + self.gear2angle), 180.0 / math.pi * self.gear4angle, 0.0)
+        self.x1 = self.w * math.cos(self.gear1angle)
+        self.y1 = self.w * math.sin(self.gear1angle)
+        self.z1 = 1.0       #horizontal movement
 
-        self.drawBox(self.box3, self.x1 + self.x2, self.y1 + self.y2, 0.0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
-        self.drawBox(self.box4, 0.0, 0.0, 1.0,  180 / math.pi * (math.pi / 2.0 + self.gear2angle), 180.0 / math.pi * self.gear4angle, 0.0)
-        self.drawBox(self.box5, 0.0, 0.0, 0.0, -90.0, 180.0 / math.pi * self.gear4angle, 0.0)
-        self.drawBox(self.box6, self.x2 - 2.0 * self.x1, self.y2 - 2.0 * self.y1,0.0, 180.0, 180.0 / math.pi * self.gear4angle, 0.0)
-        #
-        self.drawCylinder(self.cylinder1, 0.0, 0.0, 0.0, 0.0, 180.0 / math.pi * self.gear4angle, 0.0)
-        self.drawCylinder(self.cylinder2, 0.0, 0.0, 1.0, 0.0, 180.0 / math.pi * self.gear4angle, 0.0)
-        self.drawCylinder(self.cylinder3, self.x1, self.y1, 0.0, 180 / math.pi * (math.pi / 2.0 + self.gear2angle), 180.0 / math.pi * self.gear4angle, 0.0) # 0.0)
-        self.drawCylinder(self.cylinder4, self.x1, self.y1, 1.0, 180 / math.pi * (math.pi / 2.0 + self.gear2angle), 180.0 / math.pi * self.gear4angle, 0.0) # 0.0)
-        self.drawCylinder(self.cylinder5, self.x1 + self.x2, self.y1 + self.y2, 0.0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
-        self.drawCylinder(self.cylinder6, self.x1 + self.x2, self.y1 + self.y2, 1.0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
-        self.drawCylinder(self.cylinder7, self.x2, self.y2, 0.0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
-        self.drawCylinder(self.cylinder8, self.x2, self.y2, 1.0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
-        self.drawCylinder(self.cylinder9, 0.0, -4.0, 0.0, 0.0, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.x2 = -self.l * math.sin(self.gear2angle)
+        self.y2 = self.l * math.cos(self.gear2angle)
 
-        self.drawBox(self.box7, self.x2 - 2.0 * self.x1 - 2.0, self.y2 - 2.0 * self.y1, 0.0, 180.0, 180.0 / math.pi * self.gear4angle, 180.0 / math.pi * self.gear3angle)
-        self.drawBox(self.box8, self.x2 - 2.0 * self.x1 - 2.0, self.y2 - 2.0 * self.y1, 0.0, 180.0, 180.0 / math.pi * self.gear4angle, -180.0 / math.pi * self.gear3angle)
+        self.x3 = -self.l * math.sin(self.gear2angle) - self.k * math.cos(self.gear1angle)
+        self.y3 = self.l * math.cos(self.gear2angle) - self.k * math.sin(self.gear1angle)
 
-        self.drawCylinder(self.cylinder10, self.x2 - 2.0 * self.x1, self.y2 - 2.0 * self.y1, 0.0, 0.0, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawBox(self.box1, self.x0, self.y0, self.z0, 180 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawBox(self.box2, self.x1, self.y1, self.z1, 180 / math.pi * (math.pi / 2.0 + self.gear2angle), 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawBox(self.box3, self.x1 + self.x2, self.y1 + self.y2, self.z0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawBox(self.box4, self.x0, self.y0, self.z1,  180 / math.pi * (math.pi / 2.0 + self.gear2angle), 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawBox(self.box5, self.x0, self.y0, self.z0, -90.0, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawBox(self.box6, self.x3, self.y3, self.z0, 180.0, 180.0 / math.pi * self.gear4angle, 0.0)
 
-        self.drawBox(self.box9, self.x2 - 2.0 * self.x1 - 2.0 - 2.0 * math.cos(self.gear3angle), self.y2 - 2.0 * self.y1, -2.0 * math.sin(self.gear3angle), 180.0, 180.0 / math.pi * self.gear4angle, 0.0)
-        self.drawBox(self.box10, self.x2 - 2.0 * self.x1 - 2.0 - 2.0 * math.cos(self.gear3angle), self.y2 - 2.0 * self.y1, 2.0 * math.sin(self.gear3angle), 180.0, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder1, self.x0, self.y0, self.z0, 0.0, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder2, self.x0, self.y0, self.z1, 0.0, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder3, self.x1, self.y1, self.z1, 180 / math.pi * (math.pi / 2.0 + self.gear2angle), 180.0 / math.pi * self.gear4angle, 0.0) # 0.0)
+        self.drawCylinder(self.cylinder4, self.x1, self.y1, self.z0, 180 / math.pi * (math.pi / 2.0 + self.gear2angle), 180.0 / math.pi * self.gear4angle, 0.0) # 0.0)
+        self.drawCylinder(self.cylinder5, self.x1 + self.x2, self.y1 + self.y2, self.z0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder6, self.x1 + self.x2, self.y1 + self.y2, self.z1, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder7, self.x2, self.y2, self.z1, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder8, self.x2, self.y2, self.z0, 180.0 + 180.0 / math.pi * self.gear1angle, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawCylinder(self.cylinder9, self.x0, -self.b, self.z0, 0.0, 180.0 / math.pi * self.gear4angle, 0.0)
 
-        self.drawCylinder(self.cylinder11, self.x2 - 2.0 * self.x1 - 2.0, self.y2 - 2.0 * self.y1, 0.0, 0.0, 180.0 / math.pi * self.gear4angle, 90.0)
-        self.drawCylinder(self.cylinder12, self.x2 - 2.0 * self.x1 - 2.0 - 2.0 * math.cos(self.gear3angle), self.y2 - 2.0 * self.y1, -2.0 * math.sin(self.gear3angle), 0.0, 180.0 / math.pi * self.gear4angle, 90.0)
-        self.drawCylinder(self.cylinder13, self.x2 - 2.0 * self.x1 - 2.0 - 2.0 * math.cos(self.gear3angle), self.y2 - 2.0 * self.y1, 2.0 * math.sin(self.gear3angle), 0.0, 180.0 / math.pi * self.gear4angle, 90.0)
+        self.drawBox(self.box7, self.x3 - self.p, self.y3, self.z0, 180.0, 180.0 / math.pi * self.gear4angle, 180.0 / math.pi * self.gear3angle)
+        self.drawBox(self.box8, self.x3 - self.p, self.y3, self.z0, 180.0, 180.0 / math.pi * self.gear4angle, -180.0 / math.pi * self.gear3angle)
+
+        self.drawCylinder(self.cylinder10, self.x3, self.y3, self.z0, 0.0, 180.0 / math.pi * self.gear4angle, 0.0)
+
+        self.drawBox(self.box9, self.x3 - self.p - self.p * math.cos(self.gear3angle), self.y3, -self.p * math.sin(self.gear3angle), 180.0, 180.0 / math.pi * self.gear4angle, 0.0)
+        self.drawBox(self.box10, self.x3 - self.p - self.p * math.cos(self.gear3angle), self.y3, self.p * math.sin(self.gear3angle), 180.0, 180.0 / math.pi * self.gear4angle, 0.0)
+
+        self.drawCylinder(self.cylinder11, self.x3 - self.p, self.y3, self.z0, 0.0, 180.0 / math.pi * self.gear4angle, 90.0)
+        self.drawCylinder(self.cylinder12, self.x3 - self.p - self.p * math.cos(self.gear3angle), self.y3, -self.p * math.sin(self.gear3angle), 0.0, 180.0 / math.pi * self.gear4angle, 90.0)
+        self.drawCylinder(self.cylinder13, self.x3 - self.p - self.p * math.cos(self.gear3angle), self.y3, self.p * math.sin(self.gear3angle), 0.0, 180.0 / math.pi * self.gear4angle, 90.0)
 
         self.drawBox(self.box11, -6.0, -6.0, 0.0, 0.0, 0.0, 0.0)
 
