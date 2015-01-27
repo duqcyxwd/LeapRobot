@@ -77,16 +77,6 @@ class MainWindow(QMainWindow):
 	def on_startConnection_pressed(self):
 		self._controller.startConnection()
 
-
-	def on_testConnection_pressed(self):
-		print "testConnection"
-		self.testSignal.connect(self.testSignalFunction)
-		self.testSignal.emit(['c', 'd', 1, 2, 3, [1, 2, 3]])
-		
-	@QtCore.pyqtSlot(list)
-	def testSignalFunction(self, list):
-		print list
-
 	@QtCore.pyqtSlot(str, name='')
 	def updateLeapControllerLabel(self, str):
 		# print "update string: %s" % str
@@ -95,6 +85,9 @@ class MainWindow(QMainWindow):
 
 if __name__ == '__main__':
 		
+	parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+	os.sys.path.insert(0,parentdir)
+
 	app = QApplication(sys.argv)
 	widget = MainWindow()
 	widget.show()
@@ -103,6 +96,5 @@ if __name__ == '__main__':
 	widget.updateLeapControllerLabel("hi")
 	# time.sleep(3)
 	# widget.updateLeapControllerLabel("hi2")
-	i = 0
-
+	# 
 	sys.exit(app.exec_())

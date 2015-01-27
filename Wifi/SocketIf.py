@@ -50,4 +50,5 @@ class SocketIf(QtCore.QThread):
 
   def closeSocket(self):
     self.sock.close()
+    print "Socket closed"
     # self.connected = False

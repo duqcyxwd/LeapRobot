@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5 import QtCore
 
 from Model.leapController import LeapController
+from Model.Constant import *
 from View.mainwindow import MainWindow
 from Wifi.CommandIf import CommandIf
 from Model.CarEntity import CarEntity
@@ -51,7 +52,9 @@ class HMobileArm(QtCore.QObject):
 	def stopConnection(self):
 		print "stopConnection"
 		self.mw.addLog("Stop Connection")
-  		self.command_if_thread.start().terminate()
+  		self.command_if_thread.quit()
+  		self.command_if_thread.closeSocket()
+
 
 		pass
 
