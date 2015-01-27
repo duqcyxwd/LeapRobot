@@ -1,5 +1,7 @@
 import socket
 import os
+import select
+
 from PyQt5 import QtCore
 
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,9 +43,13 @@ class SocketIf(QtCore.QThread):
 
 
   def receiveMsg(self):
-    data, addr = self.sock.recvfrom(self.buffersize)
-    self.addr = addr
-    return data
+
+    self.sock.setblocking(0)
+    hasData = select.select([self.sock], [], [], 0.1)
+    if hasData[0]:
+      data = self.sock.recvfrom(self.buffersize)
+      return data[0]
+    return  ""
 
   def sendMsg(self, mes):
     self.sock.sendto(mes, self.addr)

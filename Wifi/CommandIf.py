@@ -88,7 +88,6 @@ class CommandIf(SocketIf):
     print "receive: " + data
 
     while 1:
-
       self.sock.setblocking(0)
       hasData = select.select([self.sock], [], [], 0.5)
       if hasData[0]:

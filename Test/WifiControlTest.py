@@ -24,6 +24,11 @@ BUFFER_SIZE = 1024
 print 'Start connection'
 soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 soc.bind((UPD_IP, UPD_PORT))
+
+# soc.close()
+
+soc2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+soc2.bind((UPD_IP, UPD_PORT))
  
 data, addr = soc.recvfrom(BUFFER_SIZE)
 print "receive: " + data
