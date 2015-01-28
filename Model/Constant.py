@@ -40,3 +40,10 @@ SMOOTH_UPDATE_MODEL = True
 ARM_MOVE_SPEED = 6.0					# This only works if Smooth update model is true
 ARM_MOVE_RATE = ARM_MOVE_SPEED/FPS		# This only works if Smooth update model is true
 
+ARM_HORIZONTAL_W = 3.0    # length of horizontal arm
+ARM_VERTICAL_L = 7.0    # length of vertical arm
+ARM_HORIZONTAL_K = 6.0    # length of horizontal extension
+HAND_LENGTH_H = 2.0    # hand length
+BASE_CONNECTION_B = 4.0    # base connection length
+GRABBER_LENGTH_P = 2.0    # piter length
+
