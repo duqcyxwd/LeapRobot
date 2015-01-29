@@ -39,8 +39,8 @@ class CarEntity(QtCore.QObject):
 				self.rightHandXYZ = coordinator
 				grabStrength = command[2]
 
-				angle = calculateFromXYZToDegree(coordinator[0], coordinator[1], coordinator[2], 70, 60, 20)
-				
+				angle = calculateFromXYZToDegree(coordinator[0], coordinator[1], coordinator[2], ARM_VERTICAL_L*10.0, ARM_HORIZONTAL_K*10.0, HAND_LENGTH_H*10.0)
+
 				# If that Angle is reachable 
 				if angle != False:
 					angle.append(grabStrength)
@@ -184,7 +184,7 @@ class CarEntity(QtCore.QObject):
 
 
 	def updateAngleFromSavedXYZ(self):
-		angle = calculateFromXYZToDegree(self.rightHandXYZ[0], self.rightHandXYZ[1], self.rightHandXYZ[2], 70, 60, 20)
+		angle = calculateFromXYZToDegree(self.rightHandXYZ[0], self.rightHandXYZ[1], self.rightHandXYZ[2], ARM_VERTICAL_L*10.0, ARM_HORIZONTAL_K*10.0, HAND_LENGTH_H*10.0)
 		angle.append(self.servoAngle[3])
 		self.servoAngle = angle
 		self.update()
