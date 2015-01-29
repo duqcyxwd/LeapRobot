@@ -1,7 +1,12 @@
 # This is a File Contains all the configuration data and All the Constant
 
-LOCALHOST=""
-SERVER_PORT=55555
+# WIFI Configuration
+LOCALHOST = ""
+SERVER_PORT = 55555
+
+RECEIVE_TIMEOUT = 0.5
+
+
 
 INITSPEED = 0
 INITDIR = 1

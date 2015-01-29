@@ -84,19 +84,15 @@ class CommandIf(SocketIf):
     UPD_IP = ''
     UPD_PORT = 55555
 
-    data = self.receiveMsg()
-    print "receive: " + data
 
     while 1:
-      self.sock.setblocking(0)
-      hasData = select.select([self.sock], [], [], 0.5)
-      if hasData[0]:
-        data = self.sock.recvfrom(self.buffersize)
-        print data[0]
-      else:
-        if self.updateStatus == True:
-          self.updateStatus = False
-          self.sendNewUpdate()
+      data = self.receiveMsg()
+      if data != "":
+        print "receive: " + data
+
+      if self.updateStatus == True:
+        self.updateStatus = False
+        self.sendNewUpdate()
 
 
 

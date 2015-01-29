@@ -27,6 +27,7 @@ class SocketIf(QtCore.QThread):
     self.addr = 0
 
     self.buffersize = Constant.DATABUFFERSIZE
+    self.receiveTimeout = Constant.RECEIVE_TIMEOUT
 
   def __str__(self):
     return "Connection to:"  + str(self.targetAddress)
@@ -41,13 +42,13 @@ class SocketIf(QtCore.QThread):
     except:
       return False
 
-
+  # Return empty if there is no message
   def receiveMsg(self):
-
     self.sock.setblocking(0)
-    hasData = select.select([self.sock], [], [], 0.1)
+    hasData = select.select([self.sock], [], [], self.receiveTimeout)
     if hasData[0]:
-      data = self.sock.recvfrom(self.buffersize)
+      data, addr = self.sock.recvfrom(self.buffersize)
+      self.addr = addr
       return data[0]
     return  ""
 
