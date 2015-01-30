@@ -2,7 +2,7 @@
 
 # Todo
 
- * [] Add audio support
+ * [ ] Add audio support
  * [x] ~~add wifi support~~
  * [ ] use Pyinstaller to create a executable file
  
