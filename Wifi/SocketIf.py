@@ -49,13 +49,40 @@ class SocketIf(QtCore.QThread):
     if hasData[0]:
       data, addr = self.sock.recvfrom(self.buffersize)
       self.addr = addr
-      return data[0]
+      return data
     return  ""
 
   def sendMsg(self, mes):
-    self.sock.sendto(mes, self.addr)
+    if self.addr != 0:
+      self.sock.sendto(mes, self.addr)
 
   def closeSocket(self):
     self.sock.close()
     print "Socket closed"
     # self.connected = False
+    # 
+
+  def run(self):
+
+    print "Start wifi connection"
+    while 1:
+      data = self.receiveMsg()
+      if data != "":
+        print "receive: " + data
+        print self.addr
+
+      # if self.updateStatus == True:
+      #   self.updateStatus = False
+      #   self.sendNewUpdate()
+
+if __name__ == '__main__':
+  from PyQt5.QtWidgets import QApplication
+  import sys
+
+  app = QApplication(sys.argv)
+
+  command_if_thread = SocketIf('', 55555)
+  command_if_thread.start()
+
+  sys.exit(app.exec_())
+  print "hi"
