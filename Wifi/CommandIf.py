@@ -72,8 +72,9 @@ class CommandIf(SocketIf):
     length = len(pac)
     pac = pac[0] + pack('B', length) + pac[2:]
 
-    self.sock.sendto(pac, self.addr)
-    packetCount +=1
+    if self.addr != 0:
+      self.sock.sendto(pac, self.addr)
+      packetCount +=1
 
 
 
@@ -83,6 +84,7 @@ class CommandIf(SocketIf):
 
     UPD_IP = ''
     UPD_PORT = 55555
+    data = ''
 
 
     while 1:
