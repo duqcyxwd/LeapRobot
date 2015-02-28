@@ -291,14 +291,14 @@ class RobotHandWidget(QGLWidget):
 
         return list
 
-    def cylinder(self, reflectance, outerRadius, thickness):
+    def cylinder(self, reflectance, radius, thickness):
         list = glGenLists(1)
         glNewList(list, GL_COMPILE)
         glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, reflectance)
 
-        r1 = outerRadius
-
-        delta = (2.0 * math.pi / 50) / 4.0
+        r1 = radius
+        density = 50
+        delta = (2.0 * math.pi / density) / 4.0
         z = thickness / 2.0
 
         glShadeModel(GL_FLAT)
@@ -313,8 +313,8 @@ class RobotHandWidget(QGLWidget):
 
             glBegin(GL_QUAD_STRIP)
 
-            for j in range(50):
-                angle = 2.0 * math.pi * j / 50
+            for j in range(density):
+                angle = 2.0 * math.pi * j / density
                 glVertex3d(0.0, 0.0, sign * z)
                 glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), sign * z)
                 glVertex3d(0.0, 0.0, sign * z)
@@ -324,7 +324,7 @@ class RobotHandWidget(QGLWidget):
 
         glBegin(GL_QUAD_STRIP)
 
-        for i in range(50):
+        for i in range(density):
 
                 angle = 2.0 * math.pi * i / 50
 
@@ -341,7 +341,7 @@ class RobotHandWidget(QGLWidget):
 
         glBegin(GL_QUAD_STRIP)
 
-        for i in range(51):
+        for i in range(density + 1):
             angle = i * 2.0 * math.pi / 50
             glNormal3d(-math.cos(angle), -math.sin(angle), 0.0)
             glVertex3d(0.0, 0.0, +z)
@@ -353,13 +353,13 @@ class RobotHandWidget(QGLWidget):
 
         return list
 
-    def tire(self, reflectance, outerRadius, thickness, toothSize, toothCount):
+    def tire(self, reflectance, radius, thickness, toothSize, toothCount):
         list = glGenLists(1)
         glNewList(list, GL_COMPILE)
         glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, reflectance)
 
-        r1 = outerRadius - toothSize / 2.0
-        r2 = outerRadius + toothSize / 2.0
+        r1 = radius - toothSize / 2.0
+        r2 = radius + toothSize / 2.0
         delta = (2.0 * math.pi / toothCount) / 4.0
         z = thickness / 2.0
 
@@ -481,13 +481,13 @@ class RobotHandWidget(QGLWidget):
 
             dirc = self.carEntity.getDirection()
             if dirc == 0:
-                self.tire1angle = 45.0 * math.pi / 180.0
+                self.tire1angle = 30.0 * math.pi / 180.0
                 # dirstr = 'left'
             elif dirc == 1:
                 self.tire1angle = 0.0
                 # dirstr = 'straight'
             elif dirc == 2:
-                self.tire1angle = -45.0 * math.pi / 180.0
+                self.tire1angle = -30.0 * math.pi / 180.0
                 # dirstr = 'right'
 
             servo = self.carEntity.getServoAngle()
