@@ -59,7 +59,8 @@ class CarEntity(QtCore.QObject):
 
 	def update(self):
 		if self.isReady:
-			updateMsg = [self.speed, self.direction, self.servoAngle[0], self.servoAngle[1], self.servoAngle[2], self.servoAngle[3]]
+			# updateMsg = [self.speed, self.direction, self.servoAngle[0], self.servoAngle[1], self.servoAngle[2], self.servoAngle[3]]
+			updateMsg = [self.speed, self.direction, 25, 25, 25, 25]
 			self.updateSignal.emit(updateMsg)
 
 	def getSpeed(self):
