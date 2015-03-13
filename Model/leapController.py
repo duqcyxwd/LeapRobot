@@ -36,11 +36,11 @@ class leapListener(Leap.Listener):
 					direction = hand.direction
 
 					pitch = setValueWithRange(direction.pitch * Leap.RAD_TO_DEG, LEFT_HAND_PITCH_RANGE)
-					row = setValueWithRange(normal.roll * Leap.RAD_TO_DEG, LEFT_HAND_ROLL_RANGE)
+					rollDegree = setValueWithRange(normal.roll * Leap.RAD_TO_DEG, LEFT_HAND_ROLL_RANGE)
 
 					# handDir =  np.array(hand.direction.to_float_array()).astype(int) * 100
-					msg += " left hand, pitch: %f degree, roll: %f degree" % (pitch, row)
-					li.append(['l', pitch, row])
+					msg += " left hand, pitch: %f degree, roll: %f degree" % (pitch, rollDegree)
+					li.append(['l', pitch, rollDegree])
 
 			else:
 				# If grab_strength > LEFT_GRABLIMIT, you can't move robot arm, but celebrate
