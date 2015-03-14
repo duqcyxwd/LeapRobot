@@ -66,8 +66,8 @@ class RobotHandWidget(QGLWidget):
         self.smoothUpdate =  SMOOTH_UPDATE_MODEL
         self.ArmMoveSpeed = ARM_MOVE_RATE # This only works if Smooth update model is true
 
-    def setCarEntity(self, carEntity):
-        self.carEntity = carEntity
+    # def setCarEntity(self, carEntity):
+    #     self.carEntity = carEntity
 
     def setXRotation(self, angle):
         self.normalizeAngle(angle)
@@ -468,18 +468,21 @@ class RobotHandWidget(QGLWidget):
             angle -= 360
 
 
-    def setUpdateFlag(self):
+    def setUpdateFlag(self, dataList):
         self.isUpdate = True
+        self.dataList = dataList
 
 
 
     def getCarInfo(self):
+
         # Update Information fro CarEntity
         if self.isUpdate:
             self.isUpdate = False
-            self.speed = self.carEntity.getSpeed()
 
-            dirc = self.carEntity.getDirection()
+            self.speed = self.dataList[0]
+
+            dirc = self.dataList[1]
             if dirc == 0:
                 self.tire1angle = 30.0 * math.pi / 180.0
                 # dirstr = 'left'
@@ -490,12 +493,10 @@ class RobotHandWidget(QGLWidget):
                 self.tire1angle = -30.0 * math.pi / 180.0
                 # dirstr = 'right'
 
-            servo = self.carEntity.getServoAngle()
-
-            self.gear1angle2 = servo[1] * math.pi / 180.0
-            self.gear2angle2 = servo[2] * math.pi / 180.0
-            self.gear3angle2 = servo[3] * math.pi / 180.0
-            self.gear4angle2 = servo[0] * math.pi / 180.0
+            self.gear1angle2 = self.dataList[3] * math.pi / 180.0
+            self.gear2angle2 = self.dataList[4] * math.pi / 180.0
+            self.gear3angle2 = self.dataList[5] * math.pi / 180.0
+            self.gear4angle2 = self.dataList[2] * math.pi / 180.0
 
     def updateArmPosition(self):
 

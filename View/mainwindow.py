@@ -47,10 +47,14 @@ class MainWindow(QMainWindow):
 		self.logList.addItem(string)
 		pass
 
-
-	def on_newtab_pressed(self):
+	@QtCore.pyqtSlot()
+	# NewTab for 'Start Control' button
+	def on_startController_pressed(self):
 		# Start Leap
 		self.startLeapSignal.emit()
+		# Start Wifi Connection
+		# self._controller.startConnection()
+		# TODO: Add start wifi controller here.
 
 		print "open/focus on control page";
 
@@ -62,18 +66,21 @@ class MainWindow(QMainWindow):
 		self.tabWidget.setCurrentWidget(self._controlPage)
 		self._controlPage.setCarEntity(self.carEntity)
 
+	@QtCore.pyqtSlot()
 	def on_startLeapController_pressed(self):
 		self.startLeapSignal.emit()
 		pass
 
+	@QtCore.pyqtSlot()
 	def on_stopLeapController_pressed(self):
 		self.stopLeapSignal.emit()
 		pass
 
+	@QtCore.pyqtSlot()
 	def on_stopConnection_pressed(self):
 		self._controller.stopConnection()
 
-
+	@QtCore.pyqtSlot()
 	def on_startConnection_pressed(self):
 		self._controller.startConnection()
 

@@ -41,7 +41,7 @@ class ControlPage(base_class, form_class):
 		self.updateCarInterface()
 
 		self.handWidget = RobotHandWidget()
-		self.handWidget.setCarEntity(self.carEntity)
+		# self.handWidget.setCarEntity(self.carEntity)
 
 		self.robothandLayout.addWidget(self.handWidget)
 		self.carEntity.updateSignal.connect(self.handWidget.setUpdateFlag)

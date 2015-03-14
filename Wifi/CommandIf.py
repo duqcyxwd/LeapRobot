@@ -39,6 +39,7 @@ class CommandIf(SocketIf):
     # Send command to start control leap
     return True
 
+  @QtCore.pyqtSlot(str, name='')
   def update(self, dataList):
     self.updateStatus = True
     self.dataList = dataList
