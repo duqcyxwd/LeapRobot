@@ -152,42 +152,42 @@ class CarEntity(QtCore.QObject):
 		self.update()
 
 
-
-	def servo1upByXYZ(self):
-		self.rightHandXYZ[0] += 1
-		self.updateAngleFromSavedXYZ()
-
-
-	def servo1downByXYZ(self):
-		self.rightHandXYZ[0] -= 1
-		self.updateAngleFromSavedXYZ()
+	# Changing Data By Changing the XYZ
+	# def servo1upByXYZ(self):
+	# 	self.rightHandXYZ[0] += 1
+	# 	self.updateAngleFromSavedXYZ()
 
 
-	def servo2upByXYZ(self):
-		self.rightHandXYZ[1] += 1
-		self.updateAngleFromSavedXYZ()
+	# def servo1downByXYZ(self):
+	# 	self.rightHandXYZ[0] -= 1
+	# 	self.updateAngleFromSavedXYZ()
 
 
-	def servo2downByXYZ(self):
-		self.rightHandXYZ[1] -= 1
-		self.updateAngleFromSavedXYZ()
+	# def servo2upByXYZ(self):
+	# 	self.rightHandXYZ[1] += 1
+	# 	self.updateAngleFromSavedXYZ()
 
 
-	def servo3upByXYZ(self):
-		self.rightHandXYZ[2] += 1
-		self.updateAngleFromSavedXYZ()
+	# def servo2downByXYZ(self):
+	# 	self.rightHandXYZ[1] -= 1
+	# 	self.updateAngleFromSavedXYZ()
 
 
-	def servo3downByXYZ(self):
-		self.rightHandXYZ[2] -= 1
-		self.updateAngleFromSavedXYZ()
+	# def servo3upByXYZ(self):
+	# 	self.rightHandXYZ[2] += 1
+	# 	self.updateAngleFromSavedXYZ()
 
 
-	def updateAngleFromSavedXYZ(self):
-		angle = calculateFromXYZToDegree(self.rightHandXYZ[0], self.rightHandXYZ[1], self.rightHandXYZ[2], ARM_VERTICAL_L*10.0, ARM_HORIZONTAL_K*10.0, HAND_LENGTH_H*10.0)
-		angle.append(self.servoAngle[3])
-		self.servoAngle = angle
-		self.update()
+	# def servo3downByXYZ(self):
+	# 	self.rightHandXYZ[2] -= 1
+	# 	self.updateAngleFromSavedXYZ()
+
+
+	# def updateAngleFromSavedXYZ(self):
+	# 	angle = calculateFromXYZToDegree(self.rightHandXYZ[0], self.rightHandXYZ[1], self.rightHandXYZ[2], ARM_VERTICAL_L*10.0, ARM_HORIZONTAL_K*10.0, HAND_LENGTH_H*10.0)
+	# 	angle.append(self.servoAngle[3])
+	# 	self.servoAngle = angle
+	# 	self.update()
 
 
 
