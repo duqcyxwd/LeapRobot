@@ -44,7 +44,7 @@ class HMobileArm(QtCore.QObject):
   		
   		self.command_if_thread = CommandIf(LOCALHOST, SERVER_PORT)
 
-		self.carEntity.updateSignal.connect(self.command_if_thread.update)
+		self.carEntity.updateSignalForWifi.connect(self.command_if_thread.update)
 		
   		self.command_if_thread.start()
 		pass

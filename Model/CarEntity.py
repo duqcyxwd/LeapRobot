@@ -9,6 +9,7 @@ class CarEntity(QtCore.QObject):
 	"""docstring for CarEntity"""
 
 	updateSignal = QtCore.pyqtSignal([list])
+	updateSignalForWifi = QtCore.pyqtSignal([list])
 
 	def __init__(self):
 		super(CarEntity, self).__init__()
@@ -61,6 +62,11 @@ class CarEntity(QtCore.QObject):
 		if self.isReady:
 			updateMsg = [self.speed, self.direction, self.servoAngle[0], self.servoAngle[1], self.servoAngle[2], self.servoAngle[3]]
 			self.updateSignal.emit(updateMsg)
+
+
+			updateMsg = [self.speed, self.direction, self.servoAngle[0], self.servoAngle[1], self.servoAngle[2], self.servoAngle[3]]
+			self.updateSignalForWifi.emit(updateMsg)
+
 
 	def getSpeed(self):
 		return self.speed
