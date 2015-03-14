@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QMessag
 from PyQt5.uic import loadUi
 
 from View.controlPage import ControlPage
+from View.SetUpPage import SetUpPage
 
 class MainWindow(QMainWindow):
 	startLeapSignal = QtCore.pyqtSignal()
@@ -23,6 +24,7 @@ class MainWindow(QMainWindow):
 		self.actionAbout_us.triggered.connect(self.openAbout)
 
 		self._controlPage = "null"
+		self._setUpPage = "null"
 
 	def setController(self, controller):
 		# print "set controller"
@@ -83,6 +85,19 @@ class MainWindow(QMainWindow):
 	@QtCore.pyqtSlot()
 	def on_startConnection_pressed(self):
 		self._controller.startConnection()
+
+	@QtCore.pyqtSlot()
+	def on_setUp_pressed(self):
+		print "open/focus on setUp page";
+		if self._setUpPage == "null":
+			widgetName = "setUp"
+			self._setUpPage = SetUpPage(self)
+			self.tabWidget.addTab(self._setUpPage, widgetName)
+
+		self.tabWidget.setCurrentWidget(self._setUpPage)
+		self._setUpPage.setCarEntity(self.carEntity)
+
+
 
 	@QtCore.pyqtSlot(str, name='')
 	def updateLeapControllerLabel(self, str):

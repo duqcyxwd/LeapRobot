@@ -43,14 +43,14 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
+           <widget class="QListWidget" name="logList"/>
+          </item>
+          <item>
            <widget class="QLabel" name="label">
             <property name="text">
              <string>Action Log</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <widget class="QListWidget" name="logList"/>
           </item>
           <item>
            <widget class="QWidget" name="widget" native="true">
@@ -151,9 +151,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="testConnection">
+       <widget class="QPushButton" name="setUp">
         <property name="text">
-         <string>TestConnection</string>
+         <string>SetUp</string>
         </property>
        </widget>
       </item>

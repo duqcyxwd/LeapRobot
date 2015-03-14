@@ -8,10 +8,10 @@ from View.robotHand import RobotHandWidget
 from Model import *
 
 
-form_class, base_class = loadUiType('View/controlPage.ui')
-class ControlPage(base_class, form_class):
+form_class, base_class = loadUiType('View/setUpPage.ui')
+class SetUpPage(base_class, form_class):
 	def __init__(self, *args):
-		super(ControlPage, self).__init__(*args)
+		super(SetUpPage, self).__init__(*args)
 		self.setupUi(self)
 
 	# connect carEntity and setup all connection between entity and action
@@ -40,18 +40,10 @@ class ControlPage(base_class, form_class):
 
 		self.updateCarInterface()
 
-		self.handWidget = RobotHandWidget()
-		# self.handWidget.setCarEntity(self.carEntity)
-
-		self.robothandLayout.addWidget(self.handWidget)
-		self.carEntity.updateSignal.connect(self.handWidget.setUpdateFlag)
-
-
 	@pyqtSlot()
 	def updateCarInterface(self, dataList = []):
 
 		self.speedLabel.setText(str(self.carEntity.getSpeed()))
-
 
 		dirc = self.carEntity.getDirection()
 		if dirc == 0:
