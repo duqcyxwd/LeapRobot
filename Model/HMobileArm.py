@@ -58,7 +58,6 @@ class HMobileArm(QtCore.QObject):
 
 		pass
 
-
 	def startLeapController(self):
 		self.mw.addLog("start leap controller")
 		
