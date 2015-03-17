@@ -34,16 +34,12 @@ class SetUpPage(base_class, form_class):
 		self.up4.pressed.connect(self.carEntity.servo4up)
 		self.down4.pressed.connect(self.carEntity.servo4down)
 
-
-		# self.up1.pressed.connect(self.updateModel)
-		# self.updateSignal.connect(self.carEntity.updateData)
-
 		self.updateCarInterface()
 
 	@pyqtSlot()
 	def updateCarInterface(self, dataList = []):
 
-		self.speedLabel.setText(str(self.carEntity.getSpeed()))
+		self.speed.setText(str(self.carEntity.getSpeed()))
 
 		dirc = self.carEntity.getDirection()
 		if dirc == 0:
@@ -52,7 +48,7 @@ class SetUpPage(base_class, form_class):
 			dirstr = 'stright'
 		elif dirc == 2:
 			dirstr = 'right'
-		self.dirLabel.setText(dirstr)
+		self.dir.setText(dirstr)
 		
 		servo = self.carEntity.getServoAngle()
 		self.servo0.setText(str(servo[0]))
@@ -63,7 +59,21 @@ class SetUpPage(base_class, form_class):
 		self.coordinates.setText(str(self.carEntity.rightHandXYZ))
 		
 
+	@pyqtSlot()
+	def on_send_pressed(self):
+		print "hi"
 
+		speed = int(self.speed.text())
+
+		servo0 = int(float(self.servo0.text()))
+		servo1 = int(float(self.servo1.text()))
+		servo2 = int(float(self.servo2.text()))
+		servo3 = int(float(self.servo3.text()))
+
+
+		dirction = self.carEntity.getDirection()
+		data = [speed, dirction, [servo0, servo1, servo2, servo3]]
+		self.carEntity.updateData(data)
 
 	@pyqtSlot()
 	def testFunction(self):
