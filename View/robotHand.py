@@ -33,10 +33,10 @@ class RobotHandWidget(QGLWidget):
         self.zRot = 0   # initial angle of view
 
         self.speed = INITSPEED
-        self.gear1angle = INISERVOANGLE1 * math.pi / 180.0     # red body
-        self.gear2angle = INISERVOANGLE2 * math.pi / 180.0     # green body
+        self.gear1angle = INISERVOANGLE1 * math.pi / 180.0     # red body left
+        self.gear2angle = INISERVOANGLE2 * math.pi / 180.0     # green body right
         self.gear3angle = INISERVOANGLE4 * math.pi / 180.0     # plier
-        self.gear4angle = INISERVOANGLE3 * math.pi / 180.0     # head
+        self.gear4angle = INISERVOANGLE3 * math.pi / 180.0     # head base
 
         self.gear1angle2 = self.gear1angle
         self.gear2angle2 = self.gear2angle
@@ -493,10 +493,10 @@ class RobotHandWidget(QGLWidget):
                 self.tire1angle = -30.0 * math.pi / 180.0
                 # dirstr = 'right'
 
-            self.gear1angle2 = self.dataList[3] * math.pi / 180.0  # left
-            self.gear2angle2 = self.dataList[4] * math.pi / 180.0  # clipper
-            self.gear3angle2 = self.dataList[5] * math.pi / 180.0  # right
-            self.gear4angle2 = self.dataList[2] * math.pi / 180.0  # base
+            self.gear1angle2 = self.dataList[2] * math.pi / 180.0  # left
+            self.gear2angle2 = self.dataList[3] * math.pi / 180.0  # right
+            self.gear3angle2 = self.dataList[5] * math.pi / 180.0  # clipper
+            self.gear4angle2 = self.dataList[4] * math.pi / 180.0  # base
 
     def updateArmPosition(self):
 
