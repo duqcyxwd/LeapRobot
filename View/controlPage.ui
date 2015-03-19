@@ -354,7 +354,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>servo1</string>
+                 <string>LEFT</string>
                 </property>
                </widget>
               </item>
@@ -417,7 +417,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>servo2</string>
+                 <string>RIGHT</string>
                 </property>
                </widget>
               </item>
@@ -480,7 +480,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>servo3</string>
+                 <string>BOTTOM</string>
                 </property>
                </widget>
               </item>
@@ -543,7 +543,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>servo4</string>
+                 <string>CLIPPER</string>
                 </property>
                </widget>
               </item>

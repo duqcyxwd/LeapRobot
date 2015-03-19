@@ -13,6 +13,18 @@ from Wifi.SocketIf import SocketIf
 import Model.Constant as Constant
 from Model.CommonFunction import converInHex
 
+import logging
+
+logger = logging.getLogger("wifiSignal Log");
+logf = logging.FileHandler("signal.log")
+formatter = logging.Formatter('%(name)-8s: %(levelname)-8s %(message)s')
+logf.setFormatter(formatter)
+
+logger.addHandler(logf)
+logger.setLevel(logging.INFO)
+
+
+logger.info("Test")
 
 
 class CommandIf(SocketIf):
@@ -66,16 +78,20 @@ class CommandIf(SocketIf):
     packetCount = 255
     length = 15
 
-    print 'sending'
 
-    pac = pack('cBBBBBBiI', cmd, length, di, servo0, servo1, servo2, servo3, speed, packetCount)
+    pac = pack('<cBBiiiiiI', cmd, length, di, servo0, servo1, servo2, servo3, speed, packetCount)
     pac += 'end'
     length = len(pac)
     pac = pac[0] + pack('B', length) + pac[2:]
 
+
     if self.addr != 0:
+      print 'sending '
+      # print converInHex(pac)
       self.sock.sendto(pac, self.addr)
       packetCount +=1
+
+    logger.info(pac)
 
 
 
@@ -92,6 +108,8 @@ class CommandIf(SocketIf):
       data = self.receiveMsg()
       if data != "":
         print "receive: " + data
+        logger.info(data)
+
 
       if self.updateStatus == True:
         self.updateStatus = False

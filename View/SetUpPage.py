@@ -61,7 +61,7 @@ class SetUpPage(base_class, form_class):
 
 	@pyqtSlot()
 	def on_send_pressed(self):
-		print "hi"
+		print "send button pressed"
 
 		speed = int(self.speed.text())
 
