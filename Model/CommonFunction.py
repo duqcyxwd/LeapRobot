@@ -63,7 +63,7 @@ def calculateFromXYZToDegree(x, y, z, l, k, h):
     angleBase = angleBase/math.pi*180.0
     beta = beta/math.pi*180.0
 
-    return [angleBase, alpha, beta]
+    return [alpha, beta, angleBase]
 
 
 if __name__ == '__main__':

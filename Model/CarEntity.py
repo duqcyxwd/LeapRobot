@@ -31,6 +31,7 @@ class CarEntity(QtCore.QObject):
 				self.setDirectionByCalculate(command[2])
 
 			elif command[0] == 'nl' or command[0] == 'nh':
+				# If there is no hand detected, set speed to 0
 				self.setSpeed(0)
 				self.direction = 1
 
@@ -60,13 +61,41 @@ class CarEntity(QtCore.QObject):
 
 	def update(self):
 		if self.isReady:
-			updateMsg = [self.speed, self.direction, self.servoAngle[0], self.servoAngle[1], self.servoAngle[2], self.servoAngle[3]]
+			# To be verify
+			updateMsg = [self.speed, self.direction] + self.servoAngle
 			self.updateSignal.emit(updateMsg)
 
+			updateMsg = [self.speed, self.direction] + self.getArduinoServoNum()
+			# updateMsg = [self.speed, self.direction] + self.servoAngle
+			print updateMsg
 
-			updateMsg = [self.speed, self.direction, self.servoAngle[0], self.servoAngle[1], self.servoAngle[2], self.servoAngle[3]]
+			# updateMsg = [self.speed, self.direction, self.servoAngle[0], self.servoAngle[1], self.servoAngle[2], self.servoAngle[3]]
 			self.updateSignalForWifi.emit(updateMsg)
 
+	def getArduinoServoNum(self):
+		arduinoPWM = [0, 0 , 0, 0]
+ 		arduinoPWM[0] = self.servoAngle[0]*8.0/(-3.0)+490.0
+ 		if arduinoPWM[0]<370:
+ 			arduinoPWM[0] = 370
+ 		elif arduinoPWM[0]>610:
+ 			arduinoPWM[0] = 610
+ 		
+ 		arduinoPWM[1] = self.servoAngle[1]*20.0/(9.0)+200.0
+ 		if arduinoPWM[1]<100:
+ 			arduinoPWM[1] = 100
+ 		elif arduinoPWM[1]>300:
+ 			arduinoPWM[1] = 300
+
+ 		arduinoPWM[2] = self.servoAngle[2]*8.0/3.0+360.0
+ 		if arduinoPWM[2]<160:
+ 			arduinoPWM[2] = 160
+ 		elif arduinoPWM[2]>560:
+ 			arduinoPWM[2] = 560
+
+ 		arduinoPWM[3] = 185.0
+
+
+		return arduinoPWM
 
 	def getSpeed(self):
 		return self.speed
