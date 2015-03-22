@@ -247,7 +247,7 @@
                     <item>
                      <widget class="QPushButton" name="up1">
                       <property name="text">
-                       <string>up</string>
+                       <string>Lower</string>
                       </property>
                       <property name="shortcut">
                        <string>Q</string>
@@ -257,7 +257,7 @@
                     <item>
                      <widget class="QPushButton" name="down1">
                       <property name="text">
-                       <string>down</string>
+                       <string>Lift</string>
                       </property>
                       <property name="shortcut">
                        <string>A</string>
@@ -310,7 +310,7 @@
                     <item>
                      <widget class="QPushButton" name="up2">
                       <property name="text">
-                       <string>up</string>
+                       <string>Forward</string>
                       </property>
                       <property name="shortcut">
                        <string>W</string>
@@ -320,7 +320,7 @@
                     <item>
                      <widget class="QPushButton" name="down2">
                       <property name="text">
-                       <string>down</string>
+                       <string>Backward</string>
                       </property>
                       <property name="shortcut">
                        <string>S</string>
@@ -373,7 +373,7 @@
                     <item>
                      <widget class="QPushButton" name="up3">
                       <property name="text">
-                       <string>up</string>
+                       <string>Left</string>
                       </property>
                       <property name="shortcut">
                        <string>E</string>
@@ -383,7 +383,7 @@
                     <item>
                      <widget class="QPushButton" name="down3">
                       <property name="text">
-                       <string>down</string>
+                       <string>Right</string>
                       </property>
                       <property name="shortcut">
                        <string>D</string>
@@ -436,7 +436,7 @@
                     <item>
                      <widget class="QPushButton" name="up4">
                       <property name="text">
-                       <string>up</string>
+                       <string>Open</string>
                       </property>
                       <property name="shortcut">
                        <string>R</string>
@@ -446,7 +446,7 @@
                     <item>
                      <widget class="QPushButton" name="down4">
                       <property name="text">
-                       <string>down</string>
+                       <string>Close</string>
                       </property>
                       <property name="shortcut">
                        <string>F</string>
