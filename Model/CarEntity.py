@@ -2,7 +2,7 @@ from Model.Constant import *
 from PyQt5 import QtCore
 import numpy as np
 
-from Model.CommonFunction import calculateFromXYZToDegree
+from Model.CommonFunction import calculateFromXYZToDegree,  setValueWithinLimit, convertRatio
 
 
 class CarEntity(QtCore.QObject):
@@ -30,16 +30,19 @@ class CarEntity(QtCore.QObject):
 				self.setSpeedByCalculate(command[1])
 				self.setDirectionByCalculate(command[2])
 
-			elif command[0] == 'nl' or command[0] == 'nh':
-				# If there is no hand detected, set speed to 0
-				self.setSpeed(0)
-				self.direction = 1
+			elif command[0] == 'nl':
+				self.setSpeed(INITSPEED)
+
+			elif command[0] == 'nh':
+				self.stop()
 
 			elif command[0] == 'r':
 
 				coordinator = command[1] 
 				self.rightHandXYZ = coordinator
-				grabStrength = command[2]
+
+				command[2] = setValueWithinLimit(command[2], CLIPPERMIN_HAND_LIMIT, CLIPPERMAX_HAND_LIMIT)
+				grabStrength = (command[2] - CLIPPERMIN_HAND_LIMIT) * (CLIPPERMAX - CLIPPERMIN) / (CLIPPERMAX_HAND_LIMIT - CLIPPERMIN_HAND_LIMIT) + CLIPPERMIN
 
 				angle = calculateFromXYZToDegree(coordinator[0], coordinator[1], coordinator[2], ARM_VERTICAL_L*10.0, ARM_HORIZONTAL_K*10.0, HAND_LENGTH_H*10.0)
 
@@ -52,7 +55,7 @@ class CarEntity(QtCore.QObject):
 
 
 	def updateData(self, data):
-		#if data changed
+		#if data changed 
 		#emit signal
 		self.speed = data[0]
 		self.direction = data[1]
@@ -67,38 +70,35 @@ class CarEntity(QtCore.QObject):
 
 			updateMsg = [self.speed, self.direction] + self.getArduinoServoNum()
 			# updateMsg = [self.speed, self.direction] + self.servoAngle
-			print updateMsg
 
-			# updateMsg = [self.speed, self.direction, self.servoAngle[0], self.servoAngle[1], self.servoAngle[2], self.servoAngle[3]]
 			self.updateSignalForWifi.emit(updateMsg)
 
 	def getArduinoServoNum(self):
 		arduinoPWM = [0, 0 , 0, 0]
- 		arduinoPWM[0] = self.servoAngle[0]*8.0/(-3.0)+490.0
- 		if arduinoPWM[0]<370:
- 			arduinoPWM[0] = 370
- 		elif arduinoPWM[0]>610:
- 			arduinoPWM[0] = 610
+ 		arduinoPWM[0] = int(round(self.servoAngle[0]*8.0/(-3.0)+490.0))
+ 		arduinoPWM[0] = setValueWithinLimit(arduinoPWM[0], 610, 370)
  		
- 		arduinoPWM[1] = self.servoAngle[1]*20.0/(9.0)+200.0
- 		if arduinoPWM[1]<100:
- 			arduinoPWM[1] = 100
- 		elif arduinoPWM[1]>300:
- 			arduinoPWM[1] = 300
+ 		arduinoPWM[1] = int(round(self.servoAngle[1]*20.0/(9.0)+200.0))
+ 		arduinoPWM[1] = setValueWithinLimit(arduinoPWM[1], 300, 100)
 
- 		arduinoPWM[2] = self.servoAngle[2]*8.0/3.0+360.0
- 		if arduinoPWM[2]<160:
- 			arduinoPWM[2] = 160
- 		elif arduinoPWM[2]>560:
- 			arduinoPWM[2] = 560
+ 		arduinoPWM[2] = int(round(self.servoAngle[2]*8.0/3.0+360.0))
+ 		arduinoPWM[2] = setValueWithinLimit(arduinoPWM[2], 560, 160)
 
- 		arduinoPWM[3] = 185.0
+ 		arduinoPWM[3] = int(round(convertRatio(self.servoAngle[3], CLIPPERMIN, CLIPPERMAX, CLIPPERMIN_PWM, CLIPPERMAX_PWM)))
+ 		arduinoPWM[3] = setValueWithinLimit(arduinoPWM[3], CLIPPERMIN_PWM, CLIPPERMAX_PWM)
+
+ 		# arduinoPWM[3] = self.servoAngle[3]
 
 
 		return arduinoPWM
 
 	def getSpeed(self):
 		return self.speed
+
+	def reset(self):
+		self.setSpeed(INITSPEED)
+		self.setDirection(INITDIR)
+		self.setAngle([INISERVOANGLE1, INISERVOANGLE2, INISERVOANGLE3, INISERVOANGLE4])
 
 	def setSpeedByCalculate(self, angle):
 		self.speed = int(angle * LEFT_HAND_SPEED_CONSTANT)
@@ -118,7 +118,7 @@ class CarEntity(QtCore.QObject):
 		pass
 
 	def stop(self):
-		self.speed = 0 
+		self.reset()
 		self.update()
 
 	def getDirection(self):

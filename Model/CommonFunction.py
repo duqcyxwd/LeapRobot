@@ -1,10 +1,27 @@
 import math
+# Convert number x in range x1 to x2 to range y1 to y2.
+# If x is not in range [x1, x2], make it within range
+# x1 could small than x2
+def convertRatio(number, x1, x2, y1, y2):
+    number = setValueWithinLimit(number, x1, x2)
+    if y1 == y2:
+        return y2
+    res = (number - x1) * (x2 - x1) / (y2 - y1) + y1
+    return res
 
-def setValueWithinLimit(value, max, min):
-    if value > max:
-        return max
-    elif value < min:
-        return min
+def setValueWithinLimit(value, number1, number2):
+
+    if number1 < number2:
+        maxNum = number2
+        minNum = number1
+    else:
+        maxNum = number1
+        minNum = number2
+
+    if value > maxNum:
+        return maxNum
+    elif value < minNum:
+        return minNum
     else:
         return value
 
@@ -59,9 +76,9 @@ def calculateFromXYZToDegree(x, y, z, l, k, h):
     beta = beta1 + alpha - math.pi / 2.0
 
 
-    alpha = alpha/math.pi*180.0
-    angleBase = angleBase/math.pi*180.0
-    beta = beta/math.pi*180.0
+    alpha = round(alpha/math.pi*180.0, 3)
+    angleBase = round(angleBase/math.pi*180.0, 3)
+    beta = round(beta/math.pi*180.0, 3)
 
     return [alpha, beta, angleBase]
 

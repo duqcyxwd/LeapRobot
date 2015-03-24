@@ -23,10 +23,6 @@ logf.setFormatter(formatter)
 logger.addHandler(logf)
 logger.setLevel(logging.INFO)
 
-
-logger.info("Test")
-
-
 class CommandIf(SocketIf):
   """docstring for CommandIf"""
   def __init__(self, host, port):
@@ -91,8 +87,7 @@ class CommandIf(SocketIf):
       self.sock.sendto(pac, self.addr)
       packetCount +=1
 
-    logger.info(pac)
-
+    logger.info("cmd: " + str(cmd) + " length: " + str(length) + " di: " + str(di) + " servo0: " + str(servo0) + " servo1: " + str(servo1) + " servo2: " + str(servo2) + " servo3: " + str(servo3) + " speed: " + str(speed) + " packetCount: " + str(packetCount))
 
 
   def run(self):
@@ -108,12 +103,13 @@ class CommandIf(SocketIf):
       data = self.receiveMsg()
       if data != "":
         print "receive: " + data
-        logger.info(data)
+        # logger.info(data)
 
 
       if self.updateStatus == True:
         self.updateStatus = False
         self.sendNewUpdate()
+        sleep(1)
 
 
 
