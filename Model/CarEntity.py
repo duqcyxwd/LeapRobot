@@ -108,12 +108,12 @@ class CarEntity(QtCore.QObject):
 		self.update()
 
 	def increaseSpeed(self):
-		self.speed += 1
+		self.speed += 8
 		self.update()
 		pass
 
 	def decreaseSpeed(self):
-		self.speed -= 1
+		self.speed -= 8
 		self.update()
 		pass
 

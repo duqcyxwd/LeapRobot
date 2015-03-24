@@ -34,6 +34,8 @@ class CommandIf(SocketIf):
     self.buffersize = Constant.DATABUFFERSIZE
     self.msgPip = []
 
+    self.packetCount = 0
+
     self.updateStatus = False
 
   def __str__(self):
@@ -71,11 +73,10 @@ class CommandIf(SocketIf):
 
 
 
-    packetCount = 255
     length = 15
 
 
-    pac = pack('<cBBiiiiiI', cmd, length, di, servo0, servo1, servo2, servo3, speed, packetCount)
+    pac = pack('<cBBiiiiiI', cmd, length, di, servo0, servo1, servo2, servo3, speed, self.packetCount)
     pac += 'end'
     length = len(pac)
     pac = pac[0] + pack('B', length) + pac[2:]
@@ -85,9 +86,9 @@ class CommandIf(SocketIf):
       print 'sending '
       # print converInHex(pac)
       self.sock.sendto(pac, self.addr)
-      packetCount +=1
+      self.packetCount +=1
 
-    logger.info("cmd: " + str(cmd) + " length: " + str(length) + " di: " + str(di) + " servo0: " + str(servo0) + " servo1: " + str(servo1) + " servo2: " + str(servo2) + " servo3: " + str(servo3) + " speed: " + str(speed) + " packetCount: " + str(packetCount))
+    logger.info("cmd: " + str(cmd) + " length: " + str(length) + " di: " + str(di) + " servo0: " + str(servo0) + " servo1: " + str(servo1) + " servo2: " + str(servo2) + " servo3: " + str(servo3) + " speed: " + str(speed) + " packetCount: " + str(self.packetCount))
 
 
   def run(self):
@@ -109,7 +110,7 @@ class CommandIf(SocketIf):
       if self.updateStatus == True:
         self.updateStatus = False
         self.sendNewUpdate()
-        sleep(1)
+        sleep(0.3)
 
 
 
