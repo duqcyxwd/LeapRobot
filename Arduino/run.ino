@@ -20,6 +20,16 @@
 #define BP 400
 #define CP 160 // From 140 - 190
 
+#define SINGLEMOVEDELAY 50 // Normal
+// #define SINGLEMOVEDELAY 200 // Testing
+
+#define SSMOVEDELAY 15 //Normal
+#define SSMOVEDIFFERNCE 4
+// #define SSMOVEDELAY 50 //Testing
+
+#define MOVINGPERIOD 300 // Normal
+// #define MOVINGPERIOD 2000
+
 
 // WhatisPassword
 #define SSID      "whatIsPassword"
@@ -56,6 +66,7 @@ int servo3_grabber = CP;  // graber
 
 
 long unsigned int time_point = 0;
+long unsigned int time_point2 = 0;
 char message[MESSAGEBUFFER];
 int messagePointer = 0;
 int msgstar = 0;
@@ -81,7 +92,7 @@ Adafruit_DCMotor *backMotor = AFMS.getMotor(1);
 Adafruit_DCMotor *frontMotor = AFMS.getMotor(3);
 
 
-void displayInfo(){
+void displayInfo() {
   // wifly.sendCommand("get everthing\r");
   char c;
   while (wifly.receive((uint8_t *)&c, 1, 300) > 0) {
@@ -90,8 +101,7 @@ void displayInfo(){
 }
 
 
-void setupUDP(const char *host_ip, uint16_t remote_port, uint16_t local_port)
-{
+void setupUDP(const char *host_ip, uint16_t remote_port, uint16_t local_port) {
   char cmd[32];
   
   wifly.sendCommand("set w j 1\r", "AOK");   // enable auto join
@@ -106,7 +116,7 @@ void setupUDP(const char *host_ip, uint16_t remote_port, uint16_t local_port)
   wifly.sendCommand("reboot\r");
 }
 
-void singalMove(int servoNumber, int Position) {
+void singleMove(int servoNumber, int Position) {
 
   int* servoPos;
   if (servoNumber == RIGHT)
@@ -126,7 +136,7 @@ void singalMove(int servoNumber, int Position) {
   // Serial.print("=====In move on: "); Serial.print(servoNumber);
   // Serial.print(" Pos: "); Serial.println(*servoPos);
 
-  int different = 2;
+  int different = 4;
 
   while ((*servoPos - Position) >= different || (*servoPos - Position) <= -different){
 
@@ -136,7 +146,7 @@ void singalMove(int servoNumber, int Position) {
      (*servoPos) += different; 
     }
     pwm.setPWM(servoNumber, 0, *servoPos);
-    delay(50);
+    delay(SINGLEMOVEDELAY);
 
   } 
 
@@ -149,7 +159,7 @@ void singalMove(int servoNumber, int Position) {
 
 }
 
-int singalSingalMove(int servoNumber, int Position) {
+int singleSingleMove(int servoNumber, int Position) {
   int* servoPos;
   if (servoNumber == RIGHT)
     servoPos =  &RightCurrentPosition;
@@ -160,36 +170,74 @@ int singalSingalMove(int servoNumber, int Position) {
   else if (servoNumber == CLIPPER)
     servoPos = & ClipperCurrentPosition;
 
-  int different = 1;
+  int different = SSMOVEDIFFERNCE;
 
   if ((*servoPos - Position) >= different || (*servoPos - Position) <= -different)
   {
-    if (*servoPos > Position){
+    if (*servoPos > Position)
      (*servoPos) -= different; 
-    } else {
+    else
      (*servoPos) += different; 
-    }
+
+
+
+    // Serial.print(" (");
+    // Serial.print(servoNumber);
+    // Serial.print(") ");
     pwm.setPWM(servoNumber, 0, *servoPos);
-    // delay(10);
+    delay(SSMOVEDELAY);
 
-
-    if (servoNumber != CLIPPER)
-    {
-      pwm.setPWM(servoNumber, 0, 0);
-    }
+      if (servoNumber != CLIPPER)
+        pwm.setPWM(servoNumber, 0, 0);
     return 1;
   }
+  else {
+    // pwm.setPWM(servoNumber, 0, *servoPos);
+    // delay(SSMOVEDELAY);
 
-  return 0;
+    // if (servoNumber != CLIPPER)
+    //     pwm.setPWM(servoNumber, 0, 0);
+    return 0;
+    
+  }
+
 }
 
+
+
 void smartMove(int x, int y, int z, int w) {
+  int count = 0;
   while(true) {
-    int result = singalSingalMove(LEFT, x) + singalSingalMove(RIGHT, y);
-    result += singalSingalMove(BOTTOM, z) + singalSingalMove(CLIPPER, w);
-    if (result == 0)
+    count ++;
+    int result = singleSingleMove(LEFT, x) + singleSingleMove(RIGHT, y);
+    result += singleSingleMove(BOTTOM, z) + singleSingleMove(CLIPPER, w);
+
+    // Serial.print("Current: (");
+    // Serial.print(LeftCurrentPosition);
+    // Serial.print(", ");
+    // Serial.print(RightCurrentPosition);
+    // Serial.print(", ");
+    // Serial.print(BotCurrentPosition);
+    // Serial.print(", ");
+    // Serial.print(ClipperCurrentPosition);
+    // Serial.println(") ");
+
+     // delay(2000);
+    // if (result == 0 || (millis() - time_point2 > MOVINGPERIOD)) {
+    if (result == 0) {
+      delay(100);
+      pwm.setPWM(LEFT, 0, 0);
+      pwm.setPWM(RIGHT, 0, 0);
+      pwm.setPWM(BOTTOM, 0, 0);
+      // pwm.setPWM(CLIPPER, 0, 0);
+      // delay(2000);
+
       break;
+    }
   }
+
+  Serial.print("Count:"); 
+  Serial.println(count); 
 }
 
 void MoveoverallFast(int x,int y,int z,int w){
@@ -209,19 +257,17 @@ void MoveoverallFast(int x,int y,int z,int w){
 }
 
 void moveoverall(int leftServo, int rightServo, int baseServo, int cliperServo = ClipperCurrentPosition){
-  singalMove(LEFT, leftServo);
-  singalMove(RIGHT, rightServo);
-  singalMove(BOTTOM, baseServo);
-  singalMove(CLIPPER, cliperServo);    
+  singleMove(LEFT, leftServo);
+  singleMove(RIGHT, rightServo);
+  singleMove(BOTTOM, baseServo);
+  singleMove(CLIPPER, cliperServo);
 }
 
 
 
 // Direction Control
-
 void turn(int dire){
-    // moveFoward(255);
-
+  // moveFoward(255);
   // SetUp speed and dire
   if (dire == 0)
   {
@@ -230,7 +276,7 @@ void turn(int dire){
   {
     turnStraight();
   }if (dire == 2)
-   {
+  {
     turnRight();// turn right
   } 
 
@@ -296,10 +342,9 @@ void setup() {
   pwm.begin();
   pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
 
-  moveoverall(LP, RP, BP, CP);
+  // smartMove(LP, RP, BP, CP);
 
-  delay(500);
-
+  delay(100);
 
   //for wifi purposes
   Serial.println("--------- WIFLY UDP --------");
@@ -331,28 +376,38 @@ void setup() {
 
 void loop() {
 
-  Serial.print("===================Loop ============================\n");
+  // Serial.print("===================Loop ============================\n");
   // delay(1000);
-
 
   // testing
   #if 0
-  backMotor->run(FORWARD);
-  backMotor->setSpeed(255);
-
-
-  moveoverall(LP - 10, RP - 20, BP - 200, CP);
-  delay(1000);
-  moveoverall(LP + 20, RP + 50, BP + 150, CP);
-
-
-  // smartMove(LP - 10, RP - 20, BP - 200, CP);
+  // backMotor->run(FORWARD);
+  // backMotor->setSpeed(100);
   // delay(1000);
-  // smartMove(LP + 20, RP + 50, BP + 150, CP);
+  // backMotor->setSpeed(0);
+
+
+  Serial.print("Prepare\n");
+  moveoverall(LP, RP, BP, CP);
+  Serial.print("Moving\n");
+  delay(2000);
+  Serial.print("Moving 1 \n");
+  moveoverall(LP + 50, RP + 50, BP + 150, CP);
+  delay(1000);
+
+  Serial.print("Moving back \n");
+  moveoverall(LP, RP, BP, CP);
+  delay(2000);
+
+  Serial.print("Moving 2\n");
+  smartMove(LP, RP, BP, CP);
+  delay(1000);
+  Serial.print("Moving 2 start\n");
+  smartMove(LP + 50, RP + 50, BP + 150, CP);
 
 
   backMotor->run(BACKWARD);
-  backMotor->setSpeed(255);
+  backMotor->setSpeed(100);
 
   delay(3000);
 
@@ -368,7 +423,6 @@ void loop() {
     while (wifly.available()) {
       c = wifly.read();
       message[messagePointer] = c;
-
       messagePointer = (messagePointer + 1) % MESSAGEBUFFER;
       // Serial.print(c, HEX);
       // Serial.print(":");
@@ -430,9 +484,9 @@ void loop() {
           int packetNumber = *((int *) &message[(msgstar + 23) % MESSAGEBUFFER]);
           
 
+          #if 0
           Serial.println("Receive Command update");
-          
-
+        
           Serial.print("direction: ");
           Serial.println(direction);
 
@@ -461,6 +515,7 @@ void loop() {
           Serial.print("Message Size:");
           Serial.println(mesgSize);
 
+          #endif
           char str[80];
           sprintf(str, "ACK packetSize: %d, packetNumber: %d speed: %d \r\n", packetSize, packetNumber, motorSpeed);
           wifly.send(str);
@@ -475,8 +530,8 @@ void loop() {
 
         turn(direction);
         move(motorSpeed);
-        moveoverall(servo1_left, servo2_rightServo, servo0_base, servo3_grabber);
-        // smartMove(servo1_left, servo2_rightServo, servo0_base, servo3_grabber);
+
+        // moveoverall(servo1_left, servo2_rightServo, servo0_base, servo3_grabber);
 
       }
 
@@ -485,5 +540,40 @@ void loop() {
 
   #endif 
 
+  if ((millis() - time_point2) > MOVINGPERIOD) {
+    time_point2 = millis();
+    // Serial.println("Moving...");
+
+    Serial.println("\n===============================================");
+    Serial.print("TargetPos: (");
+    Serial.print(servo1_left);
+    Serial.print(", ");
+    Serial.print(servo2_rightServo);
+    Serial.print(", ");
+    Serial.print(servo0_base);
+    Serial.print(", ");
+    Serial.print(servo3_grabber);
+    Serial.println(") ");
+
+    smartMove(servo1_left, servo2_rightServo, servo0_base, servo3_grabber);
+
+
+    // Serial.print("TargetPos: (");
+    // Serial.print(LeftCurrentPosition);
+    // Serial.print(", ");
+    // Serial.print(RightCurrentPosition);
+    // Serial.print(", ");
+    // Serial.print(BotCurrentPosition);
+    // Serial.print(", ");
+    // Serial.print(ClipperCurrentPosition);
+    // Serial.println(") ");
+  }
+
+    // send an UDP packet in every 10 second
+  if ((millis() - time_point) > 10000) {
+    time_point = millis();
+    Serial.println("Sending: WifiSignal");
+    wifly.send("I'm wifly, I'm living\r\n");
+  }
 
 }
