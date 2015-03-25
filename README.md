@@ -12,3 +12,9 @@
  * [ ] Setup page for adjustment.
  * [ ] Check the wifi Sending Speed of Arduino
  * [ ] Packet number
+
+
+ * [ ] Stop when WIFI disconnected
+ * [ ] Check Battery life time. 
+ * [ ] Check pwn wire used. 
+ * [ ] Send signal every 1/3 sec
