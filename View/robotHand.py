@@ -233,7 +233,7 @@ class RobotHandWidget(QGLWidget):
         self.lastPos = event.pos()
 
     def advanceGears(self):
-        self.gear1Rot += self.speed * 2
+        self.gear1Rot += self.speed * 0.06
 
     def xRotation(self):
         return self.xRot
