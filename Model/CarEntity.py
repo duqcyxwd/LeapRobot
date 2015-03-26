@@ -72,12 +72,12 @@ class CarEntity(QtCore.QObject):
 			updateMsg = [self.speed, self.direction] + self.servoAngle
 			self.updateSignal.emit(updateMsg)
 
-			updateMsg = [self.speed, self.direction] + self.getArduinoServoNum()
+			updateMsg =  self.getArduinoNum()
 			# updateMsg = [self.speed, self.direction] + self.servoAngle
 
 			self.updateSignalForWifi.emit(updateMsg)
 
-	def getArduinoServoNum(self):
+	def getArduinoNum(self):
 		arduinoPWM = [0, 0 , 0, 0]
  		arduinoPWM[0] = int(round(self.servoAngle[0]*8.0/(-3.0)+490.0))
  		arduinoPWM[0] = setValueWithinLimit(arduinoPWM[0], 610, 370)
@@ -91,10 +91,16 @@ class CarEntity(QtCore.QObject):
  		arduinoPWM[3] = int(round(convertRatio(self.servoAngle[3], CLIPPERMIN, CLIPPERMAX, CLIPPERMIN_PWM, CLIPPERMAX_PWM)))
  		arduinoPWM[3] = setValueWithinLimit(arduinoPWM[3], CLIPPERMIN_PWM, CLIPPERMAX_PWM)
 
- 		# arduinoPWM[3] = self.servoAngle[3]
+ 		speed = self.speed
+
+		if speed < MINIMOVESPEED and speed > (-1 * MINIMOVESPEED):
+ 			speed = 0
 
 
-		return arduinoPWM
+ 		if self.direction != 1:
+ 			speed = int(speed * 1.2)
+ 	
+		return [speed, self.direction] + arduinoPWM
 
 	def getSpeed(self):
 		return self.speed
