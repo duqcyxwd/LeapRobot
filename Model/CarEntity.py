@@ -2,6 +2,7 @@ from Model.Constant import *
 from PyQt5 import QtCore
 import numpy as np
 
+
 from Model.CommonFunction import calculateFromXYZToDegree,  setValueWithinLimit, convertRatio
 
 
@@ -23,6 +24,8 @@ class CarEntity(QtCore.QObject):
 
 		self.dataChangeRateByButton = GRAPH_BUTTON_CHANGE_RATE
 		self.isReady = True
+
+
 
 	def updateFromLeap(self, commandList):
 		for command in commandList:
@@ -63,6 +66,7 @@ class CarEntity(QtCore.QObject):
 		self.update()
 
 	def update(self):
+
 		if self.isReady:
 			# To be verify
 			updateMsg = [self.speed, self.direction] + self.servoAngle
@@ -130,9 +134,9 @@ class CarEntity(QtCore.QObject):
 
 	def setDirectionByCalculate(self, direction):
 		if direction > LEFT_HAND_DIRECTION_CONSTANT:
-			self.direction = 2
-		elif direction < -1 * LEFT_HAND_DIRECTION_CONSTANT:
 			self.direction = 0
+		elif direction < -1 * LEFT_HAND_DIRECTION_CONSTANT:
+			self.direction = 2
 		else:
 			self.direction = 1
 

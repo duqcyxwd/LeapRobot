@@ -129,21 +129,44 @@ class CommandIf(SocketIf):
 
     t = time()
     
+    count = 0
+    t2 = time()
+
+    # from time import time
+    # self.t2 = time()
+    # self.count = 0
+
+    # self.count += 1
+    # if time() - self.t2 > 5:
+    #   print self.count / 5
+    #   self.count = 0
+    #   self.t2 = time()
+
     while 1:
       data = self.receiveMsg()
-      if data != "" and data[0] == 'H':
-        print "receive: " + data
+      if data != "":
         inLogger.info(data)
+        if data[0] == 'H':
+          print "receive: " + data
 
       if self.updateStatus == True:
         self.updateStatus = False
         self.sendNewUpdate()
+        
         t = time()
-        sleep(0.3)
+        sleep(0.2)
+
+        count+=1
+        if time() - t2 > 5:
+          print str(count / 5) + "Pack / Sec"
+          count = 0
+          t2 = time()
+        
       else:
         if time() - t > 1:
           # send ack message to tell Arduino that we are still on line 
           self.sendACK()
+          t = time()
           pass
 
 
