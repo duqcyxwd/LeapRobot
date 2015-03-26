@@ -3,13 +3,15 @@
 # WIFI Configuration
 LOCALHOST = ""
 SERVER_PORT = 55555
-RECEIVE_TIMEOUT = 0.2
+RECEIVE_TIMEOUT = 0.4
 
 
 
+
+# ==========  Car  =============
 INITSPEED = 0
-# Constant for car 
 MAX_SPEED_RANGE = 255/3
+MINIMOVESPEED = 30
 
 INITDIR = 1
 INISERVOANGLE1 = 15 # 15.0 - 150.0   Left Servo, 
