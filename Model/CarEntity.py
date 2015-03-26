@@ -47,12 +47,17 @@ class CarEntity(QtCore.QObject):
 				command[2] = setValueWithinLimit(command[2], CLIPPERMIN_HAND_LIMIT, CLIPPERMAX_HAND_LIMIT)
 				grabStrength = (command[2] - CLIPPERMIN_HAND_LIMIT) * (CLIPPERMAX - CLIPPERMIN) / (CLIPPERMAX_HAND_LIMIT - CLIPPERMIN_HAND_LIMIT) + CLIPPERMIN
 
-				angle = calculateFromXYZToDegree(coordinator[0], coordinator[1], coordinator[2], ARM_VERTICAL_L*10.0, ARM_HORIZONTAL_K*10.0, HAND_LENGTH_H*10.0)
+				if self.servoAngle[3] < 5 and grabStrength > 6:
+					self.servoAngle[3] = grabStrength
+				else:
+					angle = calculateFromXYZToDegree(coordinator[0], coordinator[1], coordinator[2], ARM_VERTICAL_L*10.0, ARM_HORIZONTAL_K*10.0, HAND_LENGTH_H*10.0)
 
-				# If that Angle is reachable 
-				if angle != False:
-					angle.append(grabStrength)
-					self.setAngle(angle)
+					# If that Angle is reachable 
+					if angle != False:
+						angle.append(grabStrength)
+						self.setAngle(angle)
+					else:
+						self.servoAngle[3] = grabStrength
 
 		self.update()
 
@@ -79,11 +84,11 @@ class CarEntity(QtCore.QObject):
 
 	def getArduinoNum(self):
 		arduinoPWM = [0, 0 , 0, 0]
- 		arduinoPWM[0] = int(round(self.servoAngle[0]*8.0/(-3.0)+490.0))
- 		arduinoPWM[0] = setValueWithinLimit(arduinoPWM[0], 610, 370)
+ 		arduinoPWM[0] = int(round(self.servoAngle[0]*8.0/(-3.0)+510.0))
+ 		arduinoPWM[0] = setValueWithinLimit(arduinoPWM[0], 620, 390)
  		
- 		arduinoPWM[1] = int(round(self.servoAngle[1]*20.0/(9.0)+200.0))
- 		arduinoPWM[1] = setValueWithinLimit(arduinoPWM[1], 300, 100)
+ 		arduinoPWM[1] = int(round(self.servoAngle[1]*20.0/(9.0)+240.0))
+ 		arduinoPWM[1] = setValueWithinLimit(arduinoPWM[1], 340, 140)
 
  		arduinoPWM[2] = int(round(self.servoAngle[2]*8.0/3.0+360.0))
  		arduinoPWM[2] = setValueWithinLimit(arduinoPWM[2], 560, 160)
@@ -92,6 +97,7 @@ class CarEntity(QtCore.QObject):
  		arduinoPWM[3] = setValueWithinLimit(arduinoPWM[3], CLIPPERMIN_PWM, CLIPPERMAX_PWM)
 
  		speed = self.speed
+ 		print arduinoPWM
 
 		if speed < MINIMOVESPEED and speed > (-1 * MINIMOVESPEED):
  			speed = 0

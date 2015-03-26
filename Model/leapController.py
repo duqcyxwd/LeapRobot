@@ -117,7 +117,7 @@ class LeapController(QtCore.QThread):
 		while self._isRunning:
 			count = 0
 
-			# time.sleep(3)
+			time.sleep(0.1)
 			# print "leapController running"
 			# print "this message: " + self.message[0]
 
