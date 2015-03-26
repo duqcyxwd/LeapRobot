@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include <SoftwareSerial.h>
 #include <Arduino.h>
+// #include <EEPROM.h>
 
 
 // #include "utility/Adafruit_PWMServoDriver.h"
@@ -15,9 +16,9 @@
 #define CLIPPER 12
 
 
-#define LP 500  // Big to raise
-#define RP 250
-#define BP 400
+#define LP 450  // Big to raise
+#define RP 111
+#define BP 360
 #define CP 160 // From 140 - 190
 
 #define SINGLEMOVEDELAY 50 // Normal
@@ -30,6 +31,8 @@
 #define MOVINGPERIOD 300 // Normal
 // #define MOVINGPERIOD 2000
 
+#define NONEWIFIPERIOD 2000
+
 
 // WhatisPassword
 #define SSID      "whatIsPassword"
@@ -38,17 +41,20 @@
 #define UDP_HOST_IP        "192.168.0.19"      // broadcast
 
 
+// #define UDP_HOST_IP        "255.255.255.255"      // broadcast
 // WIFLY_AUTH_OPEN / WIFLY_AUTH_WPA1 / WIFLY_AUTH_WPA1_2 / WIFLY_AUTH_WPA2_PSK
 // #define SSID      "abc"
 // #define AUTH      WIFLY_AUTH_OPEN
-// #define UDP_HOST_IP        "255.255.255.255"      // broadcast
-// #define UDP_HOST_IP        "192.168.0.101"      // broadcast
+// #define KEY       ""
+// #define UDP_HOST_IP        "192.168.0.102"      // broadcast
+
 
 #define UDP_REMOTE_PORT    55555
 #define UDP_LOCAL_PORT     55555
 
 #define MESSAGEBUFFER 128
 
+#define SENSORPIN 10
 
 
 int LeftCurrentPosition = LP;
@@ -67,10 +73,20 @@ int servo3_grabber = CP;  // graber
 
 long unsigned int time_point = 0;
 long unsigned int time_point2 = 0;
+long unsigned int time_point3_wifiConnection = 0;
+long unsigned int time_point4_badPacketCounter = 0;
+
+
+
 char message[MESSAGEBUFFER];
 int messagePointer = 0;
 int msgstar = 0;
 int mesgSize = 0;
+
+
+int connectionStatus = 0;
+
+//pin for sensor
 
 
 // Pins' connection
@@ -203,8 +219,6 @@ int singleSingleMove(int servoNumber, int Position) {
 
 }
 
-
-
 void smartMove(int x, int y, int z, int w) {
   int count = 0;
   while(true) {
@@ -236,8 +250,11 @@ void smartMove(int x, int y, int z, int w) {
     }
   }
 
-  Serial.print("Count:"); 
-  Serial.println(count); 
+  // if (count > 10)
+  // {
+  //   Serial.print("Count:"); 
+  //   Serial.println(count); 
+  // }
 }
 
 void MoveoverallFast(int x,int y,int z,int w){
@@ -263,8 +280,6 @@ void moveoverall(int leftServo, int rightServo, int baseServo, int cliperServo =
   singleMove(CLIPPER, cliperServo);
 }
 
-
-
 // Direction Control
 void turn(int dire){
   // moveFoward(255);
@@ -279,8 +294,6 @@ void turn(int dire){
   {
     turnRight();// turn right
   } 
-
-
 }
 
 void turnRight(){
@@ -370,11 +383,68 @@ void setup() {
   // delay(1000);
   wifly.clear();
   Serial.println("Start Looping");
-  wifly.send("ACK\r\n");
+  wifly.send("HARM: ACK\r\n");
 }
 
+// void printTargetPosition(){
+//     Serial.println("\n===============================================");
+//     Serial.print("TargetPos: (");
+//     Serial.print(servo1_left);
+//     Serial.print(", ");
+//     Serial.print(servo2_rightServo);
+//     Serial.print(", ");
+//     Serial.print(servo0_base);
+//     Serial.print(", ");
+//     Serial.print(servo3_grabber);
+//     Serial.println(") ");
+// }
+
+long microsecondsToCentimeters(long microseconds)
+{
+  return microseconds / 29 / 2;
+}
+
+long sensorDistance() 
+{
+  // Serial.print(cm);
+  // Serial.println("cm");
+  long duration, cm;
+  pinMode(SENSORPIN, OUTPUT);
+  digitalWrite(SENSORPIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(SENSORPIN, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(SENSORPIN, LOW);
+
+  pinMode(SENSORPIN, INPUT);
+  duration = pulseIn(SENSORPIN, HIGH);
+
+  cm = microsecondsToCentimeters(duration);
+  return cm;
+}
 
 void loop() {
+
+  // int servo0_base = BP;  // base servo
+  // int servo1_left = LP;  // left servo
+  // int servo2_rightServo = RP;  // RIGHT servo
+  // int servo3_grabber = CP;  // graber
+  // int isMessage = 0;  // if there is a message, set to 
+
+  // EEPROM.write(0, 1);
+  // EEPROM.write(2, 2);
+  // EEPROM.write(4, 3);
+  // EEPROM.write(6, 4);
+  // byte value;
+  // value = EEPROM.read(0);  
+  // Serial.println(value, DEC);
+  // value = EEPROM.read(2);  
+  // Serial.println(value, DEC);
+  // value = EEPROM.read(4);  
+  // Serial.println(value, DEC);
+  // value = EEPROM.read(6);  
+  // Serial.println(value, DEC);
+
 
   // Serial.print("===================Loop ============================\n");
   // delay(1000);
@@ -419,7 +489,7 @@ void loop() {
   int c;
   if (wifly.available())
   {
-    //Serial.println("----------------------->");
+    // Serial.println("\n----------------------->");
     while (wifly.available()) {
       c = wifly.read();
       message[messagePointer] = c;
@@ -431,7 +501,7 @@ void loop() {
       if (c == 0x64) break;
 
     }  //end while
-    // Serial.println("\n<-----------------------");
+    // Serial.println("\n<-----------------------\n");
 
     // trying to find end string 'end'
     int e, n, d;
@@ -445,10 +515,13 @@ void loop() {
       && message[n] == 0x6E
       && message[d] == 0x64)
     {
+      time_point3_wifiConnection = millis();
+
       // find a end point. 
       if (mesgSize > 200) {
         // message is too big, something wrong here. 
       }
+      connectionStatus = 1;
 
       int packetSize = int(message[(msgstar + 1) % MESSAGEBUFFER]);  // base servo
           
@@ -459,67 +532,73 @@ void loop() {
         Serial.print("packet Size: ");
         Serial.println(packetSize);
         Serial.println("========= Bad Packet ========= ");
+        wifly.send("HARM badPack");
+        time_point4_badPacketCounter = millis();
+
         messagePointer = 0;
         msgstar = 0;
         mesgSize = 0;
       } else {
         // get a good message
-
+        
         if (char(message[(msgstar + 0) % MESSAGEBUFFER]) == 'C')
         {
-
-
-          // control model
-
+          time_point4_badPacketCounter = 0;
+          // get all information from message
           direction = int(message[(msgstar + 2) % MESSAGEBUFFER]);
-
           servo1_left = *((int *) &message[(msgstar + 3) % MESSAGEBUFFER]);  // base servo
           servo2_rightServo = *((int *) &message[(msgstar + 7) % MESSAGEBUFFER]);  // left servo
           servo0_base = *((int *) &message[(msgstar + 11) % MESSAGEBUFFER]);  // right servo
           servo3_grabber = *((int *) &message[(msgstar + 15) % MESSAGEBUFFER]);  // graber
-        
 
           // TODO; fix bug here , ring bug. 
           motorSpeed = *((int *) &message[(msgstar + 19) % MESSAGEBUFFER]);
           int packetNumber = *((int *) &message[(msgstar + 23) % MESSAGEBUFFER]);
           
 
-          #if 0
-          Serial.println("Receive Command update");
+          #if 1
+          // Serial.println("Receive Command update");
         
           Serial.print("direction: ");
-          Serial.println(direction);
+          Serial.print(direction);
 
-          Serial.print("speed: ");
+          Serial.print(", speed: ");
           Serial.println(motorSpeed);
 
-          Serial.print("servo0_base: ");
-          Serial.println(servo0_base);
+          // Serial.print("servo0_base: ");
+          // Serial.println(servo0_base);
 
-          Serial.print("servo1_left: ");
-          Serial.println(servo1_left);
+          // Serial.print("servo1_left: ");
+          // Serial.println(servo1_left);
 
-          Serial.print("servo2_rightServo: ");
-          Serial.println(servo2_rightServo);
+          // Serial.print("servo2_rightServo: ");
+          // Serial.println(servo2_rightServo);
 
 
-          Serial.print("servo3_grabber: ");
-          Serial.println(servo3_grabber);
+          // Serial.print("servo3_grabber: ");
+          // Serial.println(servo3_grabber);
           
-          Serial.print("packet number: ");
-          Serial.println(packetNumber);
+          // Serial.print("packet number: ");
+          // Serial.println(packetNumber);
           
-          Serial.print("Packet Size:");
-          Serial.println(packetSize);
+          // Serial.print("Packet Size:");
+          // Serial.println(packetSize);
 
-          Serial.print("Message Size:");
-          Serial.println(mesgSize);
+          // Serial.print("Message Size:");
+          // Serial.println(mesgSize);
 
           #endif
           char str[80];
-          sprintf(str, "ACK packetSize: %d, packetNumber: %d speed: %d \r\n", packetSize, packetNumber, motorSpeed);
+          // sprintf(str, "HARM: ACK %d \r", packetNumber);
+          sprintf(str, "HARM: ACK packetSize: %d, packetNumber: %d speed: %d \r\n", packetSize, packetNumber, motorSpeed);
           wifly.send(str);
 
+        } else if (char(message[(msgstar + 0) % MESSAGEBUFFER]) == 'A')
+        {
+          int packetNumber = *((int *) &message[(msgstar + 2) % MESSAGEBUFFER]);
+          char str[80];
+          sprintf(str, "HARM: A packetNumber: %d \r", packetNumber);
+          wifly.send(str);
         }
 
         if ((msgstar + mesgSize)%MESSAGEBUFFER == messagePointer)
@@ -528,8 +607,6 @@ void loop() {
         msgstar = messagePointer;
         mesgSize = 0;
 
-        turn(direction);
-        move(motorSpeed);
 
         // moveoverall(servo1_left, servo2_rightServo, servo0_base, servo3_grabber);
 
@@ -537,43 +614,59 @@ void loop() {
 
     } 
   } // End wifi
-
   #endif 
 
-  if ((millis() - time_point2) > MOVINGPERIOD) {
-    time_point2 = millis();
-    // Serial.println("Moving...");
-
-    Serial.println("\n===============================================");
-    Serial.print("TargetPos: (");
-    Serial.print(servo1_left);
-    Serial.print(", ");
-    Serial.print(servo2_rightServo);
-    Serial.print(", ");
-    Serial.print(servo0_base);
-    Serial.print(", ");
-    Serial.print(servo3_grabber);
-    Serial.println(") ");
-
-    smartMove(servo1_left, servo2_rightServo, servo0_base, servo3_grabber);
-
-
-    // Serial.print("TargetPos: (");
-    // Serial.print(LeftCurrentPosition);
-    // Serial.print(", ");
-    // Serial.print(RightCurrentPosition);
-    // Serial.print(", ");
-    // Serial.print(BotCurrentPosition);
-    // Serial.print(", ");
-    // Serial.print(ClipperCurrentPosition);
-    // Serial.println(") ");
-  }
-
-    // send an UDP packet in every 10 second
-  if ((millis() - time_point) > 10000) {
+  // send an UDP packet in every 10 second
+  // if ((millis() - time_point) > 10000 || connectionStatus == 0) {
+  if (connectionStatus == 0) {
     time_point = millis();
     Serial.println("Sending: WifiSignal");
-    wifly.send("I'm wifly, I'm living\r\n");
+    wifly.send("HARM: CONNECTION\r");
+    delay(500);
   }
 
-}
+
+  long unsigned int t = millis();
+  // reset H-ARM when there is no WIFI signal in 5 sec
+  if (((t - time_point3_wifiConnection) > NONEWIFIPERIOD && connectionStatus != 0)|| 
+      (time_point4_badPacketCounter != 0 && t - time_point4_badPacketCounter > 1000)) {
+    // stop, and move arm back
+    connectionStatus = 0;
+    Serial.println("No Connection, Reset everything");
+    turn(1);
+    move(0);
+    smartMove(LP, RP, BP, CP);
+  } 
+  else{
+    if ((millis() - time_point2) > MOVINGPERIOD) {
+      // Moving arm in each x sec. x is define by MOVINGPERIOD
+      time_point2 = millis();
+      // printTargetPosition();
+      smartMove(servo1_left, servo2_rightServo, servo0_base, servo3_grabber);
+    }
+
+    long cm = 100;
+    cm = sensorDistance();
+
+    // char str[80];
+    // sprintf(str, "HARM: distance: %d cm\r", cm);
+    // wifly.send(str);
+
+    // small than 10 cm, must stop
+    // small than 40 cm, speed must below 100 
+    if (cm < 10 && motorSpeed > 0) {
+      move(0);
+      // wifly.send("HARM: Stop, distance small then 30\r");
+    } else if (cm < 100 && motorSpeed > 0) {
+      // wifly.send("HARM: Slow down, distance small than 100\r");
+      if (motorSpeed > 90) {
+        turn(direction);
+        move(90);
+      }
+    } else {
+      turn(direction);
+      move(motorSpeed);
+    }
+  } 
+  delay(100);
+} // end main
