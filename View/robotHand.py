@@ -498,9 +498,9 @@ class RobotHandWidget(QGLWidget):
             self.gear3angle2 = self.dataList[5] * math.pi / 180.0  # clipper
             self.gear4angle2 = self.dataList[4] * math.pi / 180.0  # base
 
-            self.gear1angle2 = setValueWithinLimit(self.gear1angle2, 45.0 * math.pi / 180.0 , -45.0 * math.pi / 180.0)
-            self.gear2angle2 = setValueWithinLimit(self.gear2angle2, 45.0 * math.pi / 180.0 , -45.0 * math.pi / 180.0)
-            #self.gear4angle2 = setValueWithinLimit(self.gear4angle2, 90.0 * math.pi / 180.0 , -90.0 * math.pi / 180.0)
+            self.gear1angle2 = setValueWithinLimit(self.gear1angle2, LEFTSERVOMAX * math.pi / 180.0 , LEFTSERVOMIN * math.pi / 180.0)
+            self.gear2angle2 = setValueWithinLimit(self.gear2angle2, RIGHTSERVOMIN * math.pi / 180.0 , RIGHTSERVOMAX * math.pi / 180.0)
+            self.gear4angle2 = setValueWithinLimit(self.gear4angle2, BOTSERVOMIN * math.pi / 180.0 , BOTSERVOMAX * math.pi / 180.0)
 
     def updateArmPosition(self):
 

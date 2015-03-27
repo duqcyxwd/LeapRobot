@@ -85,19 +85,18 @@ class CarEntity(QtCore.QObject):
 	def getArduinoNum(self):
 		arduinoPWM = [0, 0 , 0, 0]
  		arduinoPWM[0] = int(round(self.servoAngle[0]*8.0/(-3.0)+510.0))
- 		arduinoPWM[0] = setValueWithinLimit(arduinoPWM[0], 620, 390)
+ 		arduinoPWM[0] = setValueWithinLimit(arduinoPWM[0], LEFTSERVOMAX_PWN, LEFTSERVOMIN_PWN)
  		
  		arduinoPWM[1] = int(round(self.servoAngle[1]*20.0/(9.0)+240.0))
- 		arduinoPWM[1] = setValueWithinLimit(arduinoPWM[1], 340, 140)
+ 		arduinoPWM[1] = setValueWithinLimit(arduinoPWM[1], RIGHTSERVOMIN_PWN, RIGHTSERVOMAX_PWN)
 
  		arduinoPWM[2] = int(round(self.servoAngle[2]*8.0/3.0+360.0))
- 		arduinoPWM[2] = setValueWithinLimit(arduinoPWM[2], 560, 160)
+ 		arduinoPWM[2] = setValueWithinLimit(arduinoPWM[2], BOTSERVOMIN_PWN, BOTSERVOMAX_PWN)
 
  		arduinoPWM[3] = int(round(convertRatio(self.servoAngle[3], CLIPPERMIN, CLIPPERMAX, CLIPPERMIN_PWM, CLIPPERMAX_PWM)))
  		arduinoPWM[3] = setValueWithinLimit(arduinoPWM[3], CLIPPERMIN_PWM, CLIPPERMAX_PWM)
 
  		speed = self.speed
- 		print arduinoPWM
 
 		if speed < MINIMOVESPEED and speed > (-1 * MINIMOVESPEED):
  			speed = 0
