@@ -78,6 +78,7 @@ class CommandIf(SocketIf):
       self.sock.sendto(pac, self.addr)
       # self.packetCount +=1
 
+    outLogger.info(converInHex(pac))
     outLogger.info("cmd: " + str(cmd) + " length: " + str(length) + " packetCount: " + str(self.packetCount))
 
 
@@ -115,7 +116,7 @@ class CommandIf(SocketIf):
       self.sock.sendto(pac, self.addr)
       self.packetCount +=1
 
-    # outLogger.info(converInHex(pac))
+    outLogger.info(converInHex(pac))
     outLogger.info("cmd: " + str(cmd) + " length: " + str(length) + " di: " + str(di) + " servo: [" + str(servo0) + ", " + str(servo1) + ", " + str(servo2) + ", " + str(servo3) + "] s: " + str(speed) + " packetCount: " + str(self.packetCount))
 
 
@@ -153,7 +154,7 @@ class CommandIf(SocketIf):
         self.updateStatus = False
         self.sendNewUpdate()
         
-        sleep(0.1)
+        sleep(0.2)
 
         t = time()
         count+=1

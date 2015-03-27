@@ -53,14 +53,21 @@ class CarEntity(QtCore.QObject):
 					angle = calculateFromXYZToDegree(coordinator[0], coordinator[1], coordinator[2], ARM_VERTICAL_L*10.0, ARM_HORIZONTAL_K*10.0, HAND_LENGTH_H*10.0)
 
 					# If that Angle is reachable 
-					if angle != False:
-						angle.append(grabStrength)
-						self.setAngle(angle)
-					else:
+					if angle == False:
 						self.servoAngle[3] = grabStrength
 
-		self.update()
+					else:
+						dif = angle[0] - angle[1]
+					 	if dif > 90 - MINANGLEDIF or dif < MINANGLEDIF - 90:
+							self.servoAngle[3] = grabStrength
+						else:	
+							angle.append(grabStrength)
+							self.setAngle(angle)
+							self.servoAngle[0] = setValueWithinLimit(self.servoAngle[0], LEFTSERVOMAX, LEFTSERVOMIN)
+							self.servoAngle[1] = setValueWithinLimit(self.servoAngle[1], RIGHTSERVOMIN, RIGHTSERVOMAX)
+							self.servoAngle[2] = setValueWithinLimit(self.servoAngle[2], BOTSERVOMIN, BOTSERVOMAX)
 
+		self.update()
 
 	def updateData(self, data):
 		#if data changed 
@@ -78,23 +85,23 @@ class CarEntity(QtCore.QObject):
 			self.updateSignal.emit(updateMsg)
 
 			updateMsg =  self.getArduinoNum()
-			# updateMsg = [self.speed, self.direction] + self.servoAngle
-
 			self.updateSignalForWifi.emit(updateMsg)
 
 	def getArduinoNum(self):
 		arduinoPWM = [0, 0 , 0, 0]
- 		arduinoPWM[0] = int(round(self.servoAngle[0]*8.0/(-3.0)+510.0))
- 		arduinoPWM[0] = setValueWithinLimit(arduinoPWM[0], LEFTSERVOMAX_PWN, LEFTSERVOMIN_PWN)
+ 		arduinoPWM[0] = int(round(self.servoAngle[0]*8.0/(-3.0)+LEFTMIFPOINT))
+ 		# arduinoPWM[0] = setValueWithinLimit(arduinoPWM[0], LEFTSERVOMAX_PWN, LEFTSERVOMIN_PWN)
  		
- 		arduinoPWM[1] = int(round(self.servoAngle[1]*20.0/(9.0)+240.0))
- 		arduinoPWM[1] = setValueWithinLimit(arduinoPWM[1], RIGHTSERVOMIN_PWN, RIGHTSERVOMAX_PWN)
+ 		arduinoPWM[1] = int(round(self.servoAngle[1]*20.0/(9.0)+RIGHTMIDPOINT))
+ 		# arduinoPWM[1] = setValueWithinLimit(arduinoPWM[1], RIGHTSERVOMIN_PWN, RIGHTSERVOMAX_PWN)
 
- 		arduinoPWM[2] = int(round(self.servoAngle[2]*8.0/3.0+360.0))
- 		arduinoPWM[2] = setValueWithinLimit(arduinoPWM[2], BOTSERVOMIN_PWN, BOTSERVOMAX_PWN)
+ 		arduinoPWM[2] = int(round(self.servoAngle[2]*8.0/3.0+BOTMIDPOINT))
+ 		# arduinoPWM[2] = setValueWithinLimit(arduinoPWM[2], BOTSERVOMIN_PWN, BOTSERVOMAX_PWN)
 
  		arduinoPWM[3] = int(round(convertRatio(self.servoAngle[3], CLIPPERMIN, CLIPPERMAX, CLIPPERMIN_PWM, CLIPPERMAX_PWM)))
  		arduinoPWM[3] = setValueWithinLimit(arduinoPWM[3], CLIPPERMIN_PWM, CLIPPERMAX_PWM)
+
+ 		# print arduinoPWM
 
  		speed = self.speed
 
