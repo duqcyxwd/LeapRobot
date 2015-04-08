@@ -18,6 +18,7 @@ INISERVOANGLE1 = 15 # 15.0 - 150.0   Left Servo,
 INISERVOANGLE2 = -30 # -30.0 - 90.0  Right Servo
 INISERVOANGLE3 = 0 # 16.0 - 60.0	   BASE
 INISERVOANGLE4 = 50 # -16.0 - 16.0   GRABBER
+CYLINDERDENSITY = 50 # Density of rectangles surrording cylinder
 
 
 DATABUFFERSIZE = 1024
