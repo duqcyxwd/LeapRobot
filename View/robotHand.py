@@ -297,8 +297,8 @@ class RobotHandWidget(QGLWidget):
         glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, reflectance)
 
         r1 = radius
-        density = 50
-        delta = (2.0 * math.pi / density) / 4.0
+        
+        delta = (2.0 * math.pi / CYLINDERDENSITY) / 4.0
         z = thickness / 2.0
 
         glShadeModel(GL_FLAT)
@@ -313,8 +313,8 @@ class RobotHandWidget(QGLWidget):
 
             glBegin(GL_QUAD_STRIP)
 
-            for j in range(density):
-                angle = 2.0 * math.pi * j / density
+            for j in range(CYLINDERDENSITY):
+                angle = 2.0 * math.pi * j / CYLINDERDENSITY
                 glVertex3d(0.0, 0.0, sign * z)
                 glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), sign * z)
                 glVertex3d(0.0, 0.0, sign * z)
@@ -324,9 +324,9 @@ class RobotHandWidget(QGLWidget):
 
         glBegin(GL_QUAD_STRIP)
 
-        for i in range(density):
+        for i in range(CYLINDERDENSITY):
 
-                angle = 2.0 * math.pi * i / 50
+                angle = 2.0 * math.pi * i / CYLINDERDENSITY
 
                 glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), +z)
                 glVertex3d(r1 * math.cos(angle), r1 * math.sin(angle), -z)
@@ -341,8 +341,8 @@ class RobotHandWidget(QGLWidget):
 
         glBegin(GL_QUAD_STRIP)
 
-        for i in range(density + 1):
-            angle = i * 2.0 * math.pi / 50
+        for i in range(CYLINDERDENSITY + 1):
+            angle = i * 2.0 * math.pi / CYLINDERDENSITY
             glNormal3d(-math.cos(angle), -math.sin(angle), 0.0)
             glVertex3d(0.0, 0.0, +z)
             glVertex3d(0.0, 0.0, -z)
@@ -452,12 +452,12 @@ class RobotHandWidget(QGLWidget):
         glCallList(cylinder)
         glPopMatrix()
 
-    def drawTire(self, gear, dx, dy, dz, angle, turnAngle):
+    def drawTire(self, tire, dx, dy, dz, angle, turnAngle):
         glPushMatrix()
         glTranslated(dx, dy, dz)
         glRotated(turnAngle, 0.0, 1.0, 0.0)
         glRotated(angle, 0.0, 0.0, 1.0)
-        glCallList(gear)
+        glCallList(tire)
         glPopMatrix()
 
     def normalizeAngle(self, angle):
